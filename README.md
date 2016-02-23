@@ -1,30 +1,123 @@
-# Traver
+# Traver [![Build Status](https://travis-ci.org/yukas/traver.svg?branch=master)](https://travis-ci.org/yukas/traver)
 
-[![Build Status](https://travis-ci.org/yukas/traver.svg?branch=master)](https://travis-ci.org/yukas/traver)
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/traver`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Traver is an object creation framework.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+```shell
+gem install traver
+```
+
+or add the following line to Gemfile:
 
 ```ruby
 gem 'traver'
 ```
 
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install traver
+and run `bundle install` from your shell.
 
 ## Usage
 
-TODO: Write usage instructions here
+Create object with attributes:
+
+```ruby
+blog = Traver.create(blog: { title: "Blog" }) # => #<Blog @title="Blog">
+```
+
+Define and use factories:
+
+```ruby
+Traver.factory(:post, {
+  title: "Hello"
+})
+
+Traver.factory(:published_post, :post, {
+  published: true
+})
+
+Traver.factory(:draft_post, :post, {
+  published: false
+})
+
+Traver.create(:published_post) # => #<Post @title="Hello", @published=true>
+Traver.create(:draft_post)     # => #<Post @title="Hello", @published=false>
+```
+
+Create associated objects:
+
+```ruby
+blog = Traver.create(blog: {
+  title: "Hello",
+  user: { name: "Mike" }
+})
+
+blog.user # => #<User @name="Mike">
+```
+
+Create object collections:
+
+```ruby
+blog = Traver.create(blog: {
+  title: "Hello",
+  posts: [
+    { title: "Post #1" },
+    { title: "Post #2" }
+  ]
+})
+
+blog.posts # => [#<Post @title="Post #1">, #<Post @title="Post #2">]
+
+# More concise
+blog = Traver.create(blog: {
+  title: "Hello",
+  posts: [2, title: "Post #${n}"]
+})
+
+blog.posts # => [#<Post @title="Post #1">, #<Post @title="Post #2">]
+
+# Having defined factory
+Traver.factory(post: { title: "Post #${n}"})
+
+# Even more concise
+blog = Traver.create(blog: { title: "Hello", posts: 2 })
+
+blog.posts # => [#<Post @title="Post #1">, #<Post @title="Post #2">]
+
+```
+
+Any level of nesting:
+
+```ruby
+blog = Traver.create(blog: {
+  title: "Blog",
+  posts: [{
+    title: "Hello",
+    tags: [{ name: "Happy" }]
+  }]
+})
+
+blog.posts.first.tag.first # => #<Tag @name="Happy">
+```
+
+Create lists:
+
+```ruby
+users = Traver.create_list(:user, 2, email: "user${n}@mail.me")
+# => [#<User @email="user1@mail.me">, #<User @email="user2@mail.me">]
+```
+
+Graph is a convenient way to reference created objects:
+
+```ruby
+graph = Traver.create_graph(blog: { posts: [{ tags: 2 }] })
+
+graph.blog  # => #<Blog>
+graph.posts # => [#<Post>]
+graph.post1 # => #<Post>
+graph.tags  # => [#<Tag>, #<Tag>]
+graph.tag1  # => #<Tag>
+graph.tag2  # => #<Tag>
+```
 
 ## Development
 
@@ -34,7 +127,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/traver.
+Bug reports and pull requests are welcome on GitHub at https://github.com/yukas/traver.
 
 
 ## License
