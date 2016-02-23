@@ -1,11 +1,11 @@
 require 'test_helper'
 
 class TraverTest < Minitest::Test
-  def test_that_it_has_a_version_number
-    refute_nil ::Traver::VERSION
-  end
-
-  def test_it_does_something_useful
-    assert true
+  def test_creates_object
+    define_class(:blog)
+    
+    blog = Traver.create(:blog)
+    
+    assert_instance_of Blog, blog
   end
 end
