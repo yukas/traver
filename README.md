@@ -1,6 +1,6 @@
 # Traver [![Build Status](https://travis-ci.org/yukas/traver.svg?branch=master)](https://travis-ci.org/yukas/traver)
 
-Traver is an object creation framework.
+Traver is a test data generation framework.
 
 ## Installation
 
@@ -18,7 +18,7 @@ and run `bundle install` from your shell.
 
 ## Usage
 
-Create object with attributes:
+Create an object with attributes:
 
 ```ruby
 blog = Traver.create(blog: { title: "Blog" }) # => #<Blog @title="Blog">
@@ -67,7 +67,7 @@ blog = Traver.create(blog: {
 
 blog.posts # => [#<Post @title="Post #1">, #<Post @title="Post #2">]
 
-# More concise
+# More concise syntax
 blog = Traver.create(blog: {
   title: "Hello",
   posts: [2, title: "Post #${n}"]
