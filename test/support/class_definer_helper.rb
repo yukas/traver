@@ -5,7 +5,7 @@ module ClassDefinerHelper
     class_definer.define_class(*args)
   end
   
-  def after_teardown
+  def teardown
     class_definer.undefine_all_classes
   end
   
