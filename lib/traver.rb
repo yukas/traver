@@ -1,28 +1,40 @@
 require "traver/version"
 
 module Traver
+  def self.factories
+    @factories ||= {}
+  end
+
+  def self.factory(class_name, params)
+    factories[class_name] = params
+  end
+  
   def self.create(options)
     if options.is_a?(Symbol)
-      create_bare_object(options)
+      class_name = options
+      params = factories[class_name]
     elsif options.is_a?(Hash)
-      create_object_with_attributes(*options.first)
+      class_name, params = options.first
+      params = factories[class_name].merge(params) if factories[class_name]
     end
-  end
-  
-  def self.create_bare_object(class_name)
-    klass = Object.const_get(class_name.to_s.capitalize)
     
-    klass.new
+    create_object(class_name, params)
   end
   
-  def self.create_object_with_attributes(class_name, attributes)
+  def self.create_object(class_name, params)
     klass = Object.const_get(class_name.to_s.capitalize)
     object = klass.new
     
-    attributes.each do |k, v|
-      object.public_send("#{k}=", v)
-    end
+    set_object_state(object, params)
     
     object
+  end
+  
+  def self.set_object_state(object, params)
+    params = Array(params)
+    
+    params.each do |k, v|
+      object.public_send("#{k}=", v)
+    end
   end
 end
