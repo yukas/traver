@@ -1,9 +1,6 @@
 require "test_helper"
-require "support/class_definer_helper"
 
 class TraverTest < Minitest::Test
-  include ClassDefinerHelper
-  
   def test_create_object
     define_class(:blog)
     
@@ -22,13 +19,13 @@ class TraverTest < Minitest::Test
   
   def test_define_factory
     define_class(:post, :title)
-    
+  
     Traver.factory(:post, {
       title: "Hello"
     })
-    
+  
     post = Traver.create(:post)
-    
+  
     assert_equal "Hello", post.title
   end
 end

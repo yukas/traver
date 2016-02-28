@@ -1,22 +1,19 @@
 require "traver/version"
+require "traver/factory_definer"
 
 module Traver
-  def self.factories
-    @factories ||= {}
-  end
-
   def self.factory(class_name, params)
-    factories[class_name] = params
+    factory_definer = FactoryDefiner.instance
+    factory_definer.define_factory(class_name, params)
   end
   
   def self.create(options)
-    if options.is_a?(Symbol)
-      class_name = options
-      params = factories[class_name]
-    elsif options.is_a?(Hash)
-      class_name, params = options.first
-      params = factories[class_name].merge(params) if factories[class_name]
-    end
+    options = { options => {} } if options.is_a?(Symbol)
+    
+    class_name, params = options.first
+    
+    factory_definer = FactoryDefiner.instance
+    params = factory_definer.apply_factory_params(class_name, params)
     
     create_object(class_name, params)
   end
