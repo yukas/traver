@@ -1,5 +1,6 @@
 require "traver/version"
 require "traver/factory_definer"
+require "traver/object_creator"
 
 module Traver
   def self.factory(class_name, params)
@@ -8,30 +9,9 @@ module Traver
   end
   
   def self.create(options)
-    options = { options => {} } if options.is_a?(Symbol)
+    object_creator = ObjectCreator.new(options)
+    object_creator.create_object
     
-    class_name, params = options.first
-    
-    factory_definer = FactoryDefiner.instance
-    params = factory_definer.apply_factory_params(class_name, params)
-    
-    create_object(class_name, params)
-  end
-  
-  def self.create_object(class_name, params)
-    klass = Object.const_get(class_name.to_s.capitalize)
-    object = klass.new
-    
-    set_object_state(object, params)
-    
-    object
-  end
-  
-  def self.set_object_state(object, params)
-    params = Array(params)
-    
-    params.each do |k, v|
-      object.public_send("#{k}=", v)
-    end
+    object_creator.created_object
   end
 end
