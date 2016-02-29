@@ -3,9 +3,11 @@ require "traver/factory_definer"
 require "traver/object_creator"
 
 module Traver
-  def self.factory(class_name, params)
+  class Error < Exception; end
+  
+  def self.factory(factory_name, *options)
     factory_definer = FactoryDefiner.instance
-    factory_definer.define_factory(class_name, params)
+    factory_definer.define_factory(factory_name, *options)
   end
   
   def self.create(options)

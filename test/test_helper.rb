@@ -7,4 +7,5 @@ require "support/class_definer_helper"
 
 class Minitest::Test
   include ClassDefinerHelper
+  include Traver
 end
