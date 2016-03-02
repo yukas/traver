@@ -113,10 +113,13 @@ graph = Traver.create_graph(blog: { posts: [{ tags: 2 }] })
 
 graph.blog  # => #<Blog>
 graph.posts # => [#<Post>]
+graph.post  # => #<Post>
 graph.post1 # => #<Post>
 graph.tags  # => [#<Tag>, #<Tag>]
 graph.tag1  # => #<Tag>
 graph.tag2  # => #<Tag>
+
+blog, post = Traver.create_graph(blog: { posts: 1 })[:blog, :post]
 ```
 
 ## Development
