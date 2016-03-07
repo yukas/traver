@@ -21,7 +21,7 @@ and run `bundle install` from your shell.
 Create an object with attributes:
 
 ```ruby
-blog = Traver.create(blog: { title: "Blog" }) # => #<Blog @title="Blog">
+blog = Traver.create(blog: { title: "Blog" }) #=> #<Blog @title="Blog">
 ```
 
 Define and use factories:
@@ -39,11 +39,11 @@ Traver.factory(:draft_post, :post, {
   published: false
 })
 
-Traver.create(:published_post) # => #<Post @title="Hello", @published=true>
-Traver.create(:draft_post)     # => #<Post @title="Hello", @published=false>
+Traver.create(:published_post) #=> #<Post @title="Hello", @published=true>
+Traver.create(:draft_post)     #=> #<Post @title="Hello", @published=false>
 ```
 
-Create associated objects:
+Create associated object:
 
 ```ruby
 blog = Traver.create(blog: {
@@ -51,7 +51,7 @@ blog = Traver.create(blog: {
   user: { name: "Mike" }
 })
 
-blog.user # => #<User @name="Mike">
+blog.user #=> #<User @name="Mike">
 ```
 
 Create object collections:
@@ -65,7 +65,7 @@ blog = Traver.create(blog: {
   ]
 })
 
-blog.posts # => [#<Post @title="Post #1">, #<Post @title="Post #2">]
+blog.posts #=> [#<Post @title="Post #1">, #<Post @title="Post #2">]
 
 # More concise syntax
 blog = Traver.create(blog: {
@@ -73,7 +73,7 @@ blog = Traver.create(blog: {
   posts: [2, title: "Post #${n}"]
 })
 
-blog.posts # => [#<Post @title="Post #1">, #<Post @title="Post #2">]
+blog.posts #=> [#<Post @title="Post #1">, #<Post @title="Post #2">]
 
 # Having defined factory
 Traver.factory(post: { title: "Post #${n}"})
@@ -81,7 +81,7 @@ Traver.factory(post: { title: "Post #${n}"})
 # Even more concise
 blog = Traver.create(blog: { title: "Hello", posts: 2 })
 
-blog.posts # => [#<Post @title="Post #1">, #<Post @title="Post #2">]
+blog.posts #=> [#<Post @title="Post #1">, #<Post @title="Post #2">]
 
 ```
 
@@ -96,14 +96,14 @@ blog = Traver.create(blog: {
   }]
 })
 
-blog.posts.first.tag.first # => #<Tag @name="Happy">
+blog.posts.first.tag.first #=> #<Tag @name="Happy">
 ```
 
 Create lists:
 
 ```ruby
 users = Traver.create_list(:user, 2, email: "user${n}@mail.me")
-# => [#<User @email="user1@mail.me">, #<User @email="user2@mail.me">]
+#=> [#<User @email="user1@mail.me">, #<User @email="user2@mail.me">]
 ```
 
 Graph is a convenient way to reference created objects:
@@ -111,13 +111,12 @@ Graph is a convenient way to reference created objects:
 ```ruby
 graph = Traver.create_graph(blog: { posts: [{ tags: 2 }] })
 
-graph.blog  # => #<Blog>
-graph.posts # => [#<Post>]
-graph.post  # => #<Post>
-graph.post1 # => #<Post>
-graph.tags  # => [#<Tag>, #<Tag>]
-graph.tag1  # => #<Tag>
-graph.tag2  # => #<Tag>
+graph.blog  #=> #<Blog>
+graph.posts #=> [#<Post>]
+graph.post1 #=> #<Post>
+graph.tags  #=> [#<Tag>, #<Tag>]
+graph.tag1  #=> #<Tag>
+graph.tag2  #=> #<Tag>
 
 blog, post = Traver.create_graph(blog: { posts: 1 })[:blog, :post]
 ```
