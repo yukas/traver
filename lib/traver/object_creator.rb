@@ -11,21 +11,49 @@ module Traver
     end
     
     def create_object
-      klass = factory_definer.get_object_class(factory_name)
-      @created_object = klass.new
+      @created_object = instantiate_object(get_class)
       
-      factory_params = factory_definer.apply_factory_params(factory_name, params)
-      
-      set_object_state(factory_params)
+      set_object_state(apply_factory)
     end
     
     private
     attr_reader :factory_definer
     
+    def get_class
+      factory_definer.get_object_class(factory_name)
+    end
+    
+    def instantiate_object(klass)
+      klass.new
+    end
+    
+    def apply_factory
+      factory_definer.apply_factory_params(factory_name, params)
+    end
+    
     def set_object_state(params)
-      params.each do |k, v|
-        created_object.public_send("#{k}=", v)
+      params.each do |attribute, value|
+        if nested_params?(value)
+          create_nested_object(attribute, value)
+        else
+          set_attribute(attribute, value)
+        end
       end
+    end
+    
+    def nested_params?(val)
+      val.is_a?(Hash)
+    end
+    
+    def create_nested_object(k, v)
+      object_creator = ObjectCreator.new(k => v)
+      object_creator.create_object
+      
+      set_attribute(k, object_creator.created_object)
+    end
+    
+    def set_attribute(attribute, value)
+      created_object.public_send("#{attribute}=", value)
     end
   end
 end
