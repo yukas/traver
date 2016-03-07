@@ -66,4 +66,22 @@ class TraverTest < Minitest::Test
    assert_equal "Post #1", blog.posts.first.title
    assert_equal "Post #2", blog.posts.last.title
  end
+ 
+ def test_any_level_of_nesting
+   define_class(:blog, :title, :posts)
+   define_class(:post, :title, :tags)
+   define_class(:tag,  :name)
+   
+   blog = Traver.create(blog: {
+     title: "Blog",
+     posts: [{
+       title: "Hello",
+       tags: [{ name: "Tag" }]
+     }]
+   })
+   
+   assert_equal "Blog",  blog.title
+   assert_equal "Hello", blog.posts.first.title
+   assert_equal "Tag",   blog.posts.first.tags.first.name
+ end
 end
