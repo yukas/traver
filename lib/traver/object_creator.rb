@@ -35,25 +35,47 @@ module Traver
       params.each do |attribute, value|
         if nested_params?(value)
           create_nested_object(attribute, value)
+        elsif collection_params?(value)
+          create_collection(attribute, value)
         else
           set_attribute(attribute, value)
         end
       end
     end
     
-    def nested_params?(val)
-      val.is_a?(Hash)
+    def nested_params?(params)
+      params.is_a?(Hash)
     end
     
     def create_nested_object(k, v)
-      object_creator = ObjectCreator.new(k => v)
+      set_attribute(k, do_create_object(k => v))
+    end
+    
+    def do_create_object(params)
+      object_creator = ObjectCreator.new(params)
       object_creator.create_object
       
-      set_attribute(k, object_creator.created_object)
+      object_creator.created_object
     end
     
     def set_attribute(attribute, value)
       created_object.public_send("#{attribute}=", value)
+    end
+    
+    def collection_params?(params)
+      params.is_a?(Array)
+    end
+    
+    def create_collection(attribute, collection_params)
+      collection = collection_params.map do |params|
+        do_create_object(singularize(attribute) => params)
+      end
+      
+      set_attribute(attribute, collection)
+    end
+    
+    def singularize(val)
+      val.to_s.chomp("s").to_sym
     end
   end
 end

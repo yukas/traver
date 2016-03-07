@@ -49,4 +49,21 @@ class TraverTest < Minitest::Test
     assert_equal "Hello", blog.title
     assert_equal "Mike",  blog.user.name
  end
+ 
+ def test_create_associated_collection
+   define_class(:blog, :title, :posts)
+   define_class(:post, :title)
+   
+   blog = Traver.create(blog: {
+     title: "Hello",
+     posts: [
+       { title: "Post #1" },
+       { title: "Post #2" }
+     ]
+   })
+   
+   assert_equal "Hello",   blog.title
+   assert_equal "Post #1", blog.posts.first.title
+   assert_equal "Post #2", blog.posts.last.title
+ end
 end
