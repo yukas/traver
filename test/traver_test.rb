@@ -69,12 +69,12 @@ class TraverTest < Minitest::Test
    assert_equal "Post #2", blog.posts.last.title
  end
  
- def test_any_level_of_nesting
+ def test_create_graph
    define_class(:blog, :title, :posts)
    define_class(:post, :title, :tags)
    define_class(:tag,  :name)
    
-   blog = Traver.create(blog: {
+   graph = Traver.create_graph(blog: {
      title: "Blog",
      posts: [{
        title: "Hello",
@@ -82,8 +82,14 @@ class TraverTest < Minitest::Test
      }]
    })
    
-   assert_equal "Blog",  blog.title
-   assert_equal "Hello", blog.posts.first.title
-   assert_equal "Tag",   blog.posts.first.tags.first.name
+   assert_equal "Blog",  graph[:blog].title
+   
+   assert_equal "Hello", graph[:post].title
+   assert_equal "Hello", graph[:post1].title
+   assert_equal "Hello", graph[:posts].first.title
+   
+   assert_equal "Tag", graph[:tag].name
+   assert_equal "Tag", graph[:tag1].name
+   assert_equal "Tag", graph[:tags].first.name
  end
 end

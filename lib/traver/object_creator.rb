@@ -1,6 +1,7 @@
 module Traver
   class ObjectCreator
     attr_reader :factory_name, :params
+    attr_accessor :after_create
     attr_reader :created_object
     
     def initialize(options)
@@ -14,6 +15,7 @@ module Traver
       instantiate_object
       set_object_state
       persist_object
+      call_after_create_hook
     end
     
     private
@@ -53,6 +55,7 @@ module Traver
     
     def do_create_object(params)
       object_creator = ObjectCreator.new(params)
+      object_creator.after_create = after_create
       object_creator.create_object
       
       object_creator.created_object
@@ -80,6 +83,10 @@ module Traver
     
     def persist_object
       created_object.save if defined?(Rails)
+    end
+    
+    def call_after_create_hook
+      after_create.call(self) if after_create
     end
   end
 end

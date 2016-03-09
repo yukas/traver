@@ -1,6 +1,8 @@
 require "traver/version"
 require "traver/factory_definer"
 require "traver/object_creator"
+require "traver/graph"
+require "traver/graph_creator"
 
 module Traver
   class Error < Exception; end
@@ -15,5 +17,12 @@ module Traver
     object_creator.create_object
     
     object_creator.created_object
+  end
+  
+  def self.create_graph(params = {})
+    graph_creator = GraphCreator.new(params)
+    graph_creator.create_graph
+    
+    graph_creator.graph
   end
 end
