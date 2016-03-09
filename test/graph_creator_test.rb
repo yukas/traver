@@ -9,6 +9,6 @@ class GraphCreatorTest < MiniTest::Test
     
     graph_creator.create_graph
     
-    assert_instance_of Blog, graph_creator.graph[:blog] 
+    assert_instance_of Blog, graph_creator.graph.blog
   end
 end

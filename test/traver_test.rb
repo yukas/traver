@@ -82,14 +82,14 @@ class TraverTest < Minitest::Test
      }]
    })
    
-   assert_equal "Blog",  graph[:blog].title
+   assert_equal "Blog",  graph.blog.title
    
-   assert_equal "Hello", graph[:post].title
-   assert_equal "Hello", graph[:post1].title
-   assert_equal "Hello", graph[:posts].first.title
+   assert_equal "Hello", graph.post.title
+   assert_equal "Hello", graph.post1.title
+   assert_equal "Hello", graph.posts.first.title
    
-   assert_equal "Tag", graph[:tag].name
-   assert_equal "Tag", graph[:tag1].name
-   assert_equal "Tag", graph[:tags].first.name
+   assert_equal "Tag", graph.tag.name
+   assert_equal "Tag", graph.tag1.name
+   assert_equal "Tag", graph.tags.first.name
  end
 end

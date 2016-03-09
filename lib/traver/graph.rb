@@ -22,6 +22,10 @@ module Traver
       end
     end
     
+    def method_missing(method_name, *args)
+      self[method_name]
+    end
+    
     private
     attr_reader :vertices
     
