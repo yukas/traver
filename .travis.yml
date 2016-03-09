@@ -8,4 +8,6 @@ rvm:
 before_install: gem install bundler -v 1.11.2
 
 notifications:
-  email: false
+  email:
+    on_success: never
+    on_failure: always
