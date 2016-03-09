@@ -11,28 +11,24 @@ module Traver
     end
     
     def create_object
-      @created_object = instantiate_object(get_class)
-      
-      set_object_state(apply_factory)
+      instantiate_object
+      set_object_state
+      persist_object
     end
     
     private
     attr_reader :factory_definer
     
+    def instantiate_object
+      @created_object = get_class.new
+    end
+    
     def get_class
       factory_definer.get_object_class(factory_name)
     end
     
-    def instantiate_object(klass)
-      klass.new
-    end
-    
-    def apply_factory
-      factory_definer.apply_factory_params(factory_name, params)
-    end
-    
-    def set_object_state(params)
-      params.each do |attribute, value|
+    def set_object_state
+      factory_params.each do |attribute, value|
         if nested_params?(value)
           create_nested_object(attribute, value)
         elsif collection_params?(value)
@@ -41,6 +37,10 @@ module Traver
           set_attribute(attribute, value)
         end
       end
+    end
+
+    def factory_params
+      factory_definer.apply_factory_params(factory_name, params)
     end
     
     def nested_params?(params)
@@ -76,6 +76,10 @@ module Traver
     
     def singularize(val)
       val.to_s.chomp("s").to_sym
+    end
+    
+    def persist_object
+      created_object.save if defined?(Rails)
     end
   end
 end

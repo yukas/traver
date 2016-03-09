@@ -1,6 +1,8 @@
 require "test_helper"
 
 class FactoryDefinerTest < MiniTest::Test
+  include ClassDefinerHelper
+  
   attr_reader :subject
   
   def setup
@@ -49,6 +51,7 @@ class FactoryDefinerTest < MiniTest::Test
   
   def test_get_object_class
     define_class(:post)
+    
     subject.define_factory(:post, title: "Hello")
     subject.define_factory(:tagged_post, :post, tags: "tag")
     subject.define_factory(:published_post, :tagged_post, published: true)
