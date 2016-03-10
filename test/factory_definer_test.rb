@@ -20,6 +20,14 @@ class FactoryDefinerTest < MiniTest::Test
     ], subject.defined_factories
   end
   
+  def test_undefine_all_factories
+    subject.define_factory(:post, title: "Hello")
+    
+    subject.undefine_all_factories
+    
+    assert_equal Hash.new, subject.defined_factories
+  end
+  
   def test_define_factory_with_a_parent
     subject.define_factory(:published_post, :post, published: true)
     

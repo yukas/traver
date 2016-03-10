@@ -25,4 +25,10 @@ module Traver
     
     graph_creator.graph
   end
+  
+  def self.load_factories(base_dir_string, test_folder_name = "test")
+    factories_file_path = File.join(base_dir_string, test_folder_name, "factories.rb")
+    
+    require factories_file_path
+  end
 end

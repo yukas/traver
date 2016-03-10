@@ -121,6 +121,9 @@ graph.tag2  #=> #<Tag>
 blog, post = Traver.create_graph(blog: { posts: 1 })[:blog, :post]
 ```
 
+## Rails
+By default Traver loads factories from`test/factories.rb` or `spec/factories.rb` for rspec users.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

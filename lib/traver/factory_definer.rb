@@ -1,13 +1,17 @@
 module Traver
   class FactoryDefiner
     attr_reader :defined_factories
-    
-    def initialize
-      @defined_factories = {}
-    end
-    
+
     def self.instance
       @instance ||= FactoryDefiner.new
+    end
+    
+    def initialize
+      undefine_all_factories
+    end
+    
+    def undefine_all_factories
+      @defined_factories = {}
     end
     
     def define_factory(factory_name, *options)

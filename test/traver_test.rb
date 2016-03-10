@@ -3,6 +3,10 @@ require "test_helper"
 class TraverTest < Minitest::Test
   include ClassDefinerHelper
   
+  def teardown
+    FactoryDefiner.instance.undefine_all_factories
+  end
+  
   def test_create_object
     define_class(:blog)
     
@@ -91,5 +95,30 @@ class TraverTest < Minitest::Test
    assert_equal "Tag", graph.tag.name
    assert_equal "Tag", graph.tag1.name
    assert_equal "Tag", graph.tags.first.name
+ end
+ 
+ def test_loads_factories_from_test_directory
+   define_class(:blog, :title)
+   define_class(:post, :title)
+   base_dir = File.join(__dir__, "support", "dummy")
+   
+   Traver.load_factories(base_dir, "test")
+   
+   blog = Traver.create(:blog)
+   post = Traver.create(:post)
+   
+   assert_equal "Blog", blog.title
+   assert_equal "Post", post.title
+ end
+ 
+ def test_loads_factories_from_spec_directory
+   define_class(:user, :name)
+   base_dir = File.join(__dir__, "support", "dummy")
+   
+   Traver.load_factories(base_dir, "spec")
+   
+   user = Traver.create(:user)
+   
+   assert_equal "Walter", user.name
  end
 end
