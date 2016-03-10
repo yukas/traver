@@ -8,7 +8,7 @@ class ArClassDefiner
   end
   
   def define_class(class_name, attributes = {}, &block)
-    defined_class = Object.const_set(class_name.to_s.capitalize, Class.new(ActiveRecord::Base))
+    defined_class = Object.const_set(camelize(class_name.to_s), Class.new(ActiveRecord::Base))
     defined_classes << defined_class
     
     create_table(defined_class.table_name) do |table|
@@ -21,8 +21,9 @@ class ArClassDefiner
   end
   
   def undefine_all_classes
-    defined_classes.each do |klass|
+    defined_classes.reject! do |klass|
       undefine_class(klass)
+      true
     end
   end
   
@@ -54,6 +55,10 @@ class ArClassDefiner
   def remove_constant(const_name)
     Object.send(:remove_const, const_name)
   end
+  
+  def camelize(str)
+    str.split('_').map(&:capitalize).join
+  end
 end
 
 if __FILE__ == $0
@@ -72,10 +77,26 @@ if __FILE__ == $0
       class_definer.undefine_all_classes
     end
     
-    def test_defines_class
+    def test_define_class
       class_definer.define_class(:blog)
-    
+      
+      assert defined?(Blog)
       assert_equal ActiveRecord::Base, Blog.superclass
+    end
+    
+    def test_define_class_with_camel_case
+      class_definer.define_class(:blog_post)
+      
+      assert defined?(BlogPost)
+      assert_equal ActiveRecord::Base, BlogPost.superclass
+    end
+    
+    def test_undefine_classes_with_camel_case
+      class_definer.define_class(:blog_post)
+      
+      class_definer.undefine_all_classes
+      
+      refute defined?(BlogPost)
     end
     
     def test_defines_class_with_attributes

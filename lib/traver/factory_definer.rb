@@ -26,7 +26,7 @@ module Traver
       if defined_factories[factory_name] && parent_name = defined_factories[factory_name][:parent]
         get_object_class(parent_name)
       else
-        Object.const_get(factory_name.to_s.capitalize)
+        Object.const_get(camelize(factory_name.to_s))
       end
     end
     
@@ -42,6 +42,10 @@ module Traver
       if factory = defined_factories[factory_name]
         get_factory_params(factory[:parent]).merge(factory[:params])
       end || {}
+    end
+    
+    def camelize(str)
+      str.split('_').map(&:capitalize).join
     end
   end
 end

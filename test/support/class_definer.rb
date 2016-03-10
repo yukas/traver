@@ -6,12 +6,10 @@ class ClassDefiner
   end
   
   def define_class(class_name, *params)
-    class_name = class_name.to_s.capitalize
-  
     defined_class = if params.empty?
-      Object.const_set(class_name, Class.new)
+      Object.const_set(camelize(class_name.to_s), Class.new)
     else
-      Object.const_set(class_name, Struct.new(*params))
+      Object.const_set(camelize(class_name.to_s), Struct.new(*params))
     end
   
     defined_class_names << class_name
@@ -26,7 +24,13 @@ class ClassDefiner
   end
 
   def undefine_class(class_name)
-    Object.send(:remove_const, class_name.to_s.capitalize)
+    Object.send(:remove_const, camelize(class_name.to_s))
+  end
+  
+  private
+  
+  def camelize(str)
+    str.split('_').map(&:capitalize).join
   end
 end
 
@@ -44,6 +48,16 @@ if __FILE__ == $0
       assert defined?(Blog)
     
       Object.send(:remove_const, "Blog")
+    end
+
+    def test_defines_class_with_camel_case
+      class_definer = ClassDefiner.new
+    
+      class_definer.define_class(:blog_post)
+    
+      assert defined?(BlogPost)
+    
+      Object.send(:remove_const, "BlogPost")
     end
 
     def test_undefines_class
@@ -64,6 +78,15 @@ if __FILE__ == $0
     
       refute defined?(Blog)
       refute defined?(Post)
+    end
+    
+    def test_undefine_classes_with_camel_case
+      class_definer = ClassDefiner.new
+      class_definer.define_class(:blog_post)
+      
+      class_definer.undefine_all_classes
+    
+      refute defined?(BlogPost)
     end
   end
 end

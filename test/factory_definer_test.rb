@@ -56,8 +56,14 @@ class FactoryDefinerTest < MiniTest::Test
     subject.define_factory(:tagged_post, :post, tags: "tag")
     subject.define_factory(:published_post, :tagged_post, published: true)
     
-    result = subject.get_object_class(:published_post)
+    assert_equal Post, subject.get_object_class(:published_post)
+  end
+  
+  def test_get_object_class_camel_case
+    define_class(:blog_post)
     
-    assert_equal Post, result
+    subject.define_factory(:blog_post, title: "Hello")
+    
+    assert_equal BlogPost, subject.get_object_class(:blog_post)
   end
 end
