@@ -1,6 +1,6 @@
 require "test_helper"
 
-class GraphTest < MiniTest::Test
+class GraphTest < TraverTest
   attr_reader :subject
   
   def setup

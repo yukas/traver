@@ -1,6 +1,6 @@
 require "test_helper"
 
-class FactoryDefinerTest < MiniTest::Test
+class FactoryDefinerTest < TraverTest
   include ClassDefinerHelper
   
   attr_reader :subject

@@ -1,6 +1,6 @@
 require "test_helper"
 
-class GraphCreatorTest < MiniTest::Test
+class GraphCreatorTest < TraverTest
   include ClassDefinerHelper
   
   def test_create_graph

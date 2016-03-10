@@ -1,6 +1,6 @@
 require "test_helper"
 
-class ObjectCreatorTest < MiniTest::Test
+class ObjectCreatorTest < TraverTest
   include ClassDefinerHelper
   
   def test_create_object

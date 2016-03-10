@@ -1,11 +1,7 @@
 require "test_helper"
 
-class TraverTest < Minitest::Test
+class IntegrationTest < TraverTest
   include ClassDefinerHelper
-  
-  def teardown
-    FactoryDefiner.instance.undefine_all_factories
-  end
   
   def test_create_object
     define_class(:blog)

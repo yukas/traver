@@ -7,6 +7,10 @@ require "support/class_definer_helper"
 require "support/ar_class_definer_helper"
 require "active_record"
 
-class Minitest::Test
+class TraverTest < Minitest::Test
   include Traver
+  
+  def setup
+    FactoryDefiner.instance.undefine_all_factories
+  end
 end
