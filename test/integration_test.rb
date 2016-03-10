@@ -96,7 +96,7 @@ class IntegrationTest < TraverTest
  def test_loads_factories_from_test_directory
    define_class(:blog, :title)
    define_class(:post, :title)
-   base_dir = File.join(__dir__, "support", "dummy")
+   base_dir = File.join(Dir.pwd, "test", "support", "dummy")
    
    Traver.load_factories(base_dir, "test")
    
@@ -109,7 +109,7 @@ class IntegrationTest < TraverTest
  
  def test_loads_factories_from_spec_directory
    define_class(:user, :name)
-   base_dir = File.join(__dir__, "support", "dummy")
+   base_dir = File.join(Dir.pwd, "test", "support", "dummy")
    
    Traver.load_factories(base_dir, "spec")
    
