@@ -21,6 +21,8 @@ class TraverTest < Minitest::Test
     super
     
     Traver.factory_definer = FactoryDefiner.new
+    Traver.object_persister = PoroObjectPersister.new
+    Traver.factories_loader = NilFactoriesLoader.new
   end
   
   def teardown

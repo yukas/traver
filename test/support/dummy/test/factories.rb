@@ -1,7 +1,3 @@
-Traver.define_factory(:blog, {
-  title: "Blog"
-})
-
-Traver.define_factory(:post, {
-  title: "Post"
+Traver.define_factory(:user, {
+  name: "Walter Test"
 })

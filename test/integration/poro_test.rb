@@ -1,12 +1,6 @@
 require "test_helper"
 
-class PoroTest < TraverTest
-  def setup
-    super
-    
-    Traver.object_persister = PoroObjectPersister.new
-  end
-  
+class PoroTest < TraverTest  
   def test_create_object
     define_class("Blog")
     
@@ -95,28 +89,5 @@ class PoroTest < TraverTest
    assert_equal "Tag", graph.tag.name
    assert_equal "Tag", graph.tag1.name
    assert_equal "Tag", graph.tags.first.name
- end
- 
- def test_loads_factories_from_test_directory
-   define_class("Blog", :title)
-   define_class("Post", :title)
-   base_dir = File.join(Dir.pwd, "test", "support", "dummy")
-   
-   Traver.load_factories(base_dir, "test")
-   blog = Traver.create(:blog)
-   post = Traver.create(:post)
-   
-   assert_equal "Blog", blog.title
-   assert_equal "Post", post.title
- end
- 
- def test_loads_factories_from_spec_directory
-   define_class("User", :name)
-   base_dir = File.join(Dir.pwd, "test", "support", "dummy")
-   
-   Traver.load_factories(base_dir, "spec")
-   user = Traver.create(:user)
-   
-   assert_equal "Walter", user.name
  end
 end

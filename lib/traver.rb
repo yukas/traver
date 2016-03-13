@@ -7,12 +7,13 @@ require "traver/graph"
 require "traver/graph_creator"
 require "traver/object_persisters/active_record_object_persister"
 require "traver/object_persisters/poro_object_persister"
+require "traver/factories_loader"
 
 module Traver
   class Error < Exception; end
   
   class << self
-    attr_accessor :factory_definer, :object_persister
+    attr_accessor :factory_definer, :object_persister, :factories_loader
   end
   
   def self.define_factory(factory_name, *options)
@@ -28,6 +29,8 @@ module Traver
   end
   
   def self.create(options)
+    factories_loader.load_factories
+    
     options = { options => {} } if options.is_a?(Symbol)
     
     object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister)
@@ -37,6 +40,8 @@ module Traver
   end
   
   def self.create_graph(options)
+    factories_loader.load_factories
+    
     options = { options => {} } if options.is_a?(Symbol)
     
     object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister)
@@ -44,11 +49,5 @@ module Traver
     graph_creator.create_graph
     
     graph_creator.graph
-  end
-  
-  def self.load_factories(base_dir_string, test_folder_name = "test")
-    factories_file_path = File.join(base_dir_string, test_folder_name, "factories.rb")
-    
-    require factories_file_path
   end
 end
