@@ -5,12 +5,18 @@ require "traver/factory"
 require "traver/object_creator"
 require "traver/graph"
 require "traver/graph_creator"
+require "traver/object_persisters/active_record_object_persister"
+require "traver/object_persisters/poro_object_persister"
 
 module Traver
   class Error < Exception; end
   
   def self.factory_definer
     @factory_definer ||= FactoryDefiner.new
+  end
+  
+  def self.object_persister
+    @object_persister ||= PoroObjectPersister.new
   end
   
   def self.factory(factory_name, *options)
@@ -28,7 +34,7 @@ module Traver
   def self.create(options)
     options = { options => {} } if options.is_a?(Symbol)
     
-    object_creator = ObjectCreator.new(*options.first, factory_definer)
+    object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister)
     object_creator.create_object
     
     object_creator.created_object
@@ -37,7 +43,8 @@ module Traver
   def self.create_graph(options)
     options = { options => {} } if options.is_a?(Symbol)
     
-    graph_creator = GraphCreator.new(*options.first, factory_definer)
+    object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister)
+    graph_creator = GraphCreator.new(object_creator)
     graph_creator.create_graph
     
     graph_creator.graph
