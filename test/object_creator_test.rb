@@ -4,6 +4,8 @@ class ObjectCreatorTest < TraverTest
   attr_reader :factory_definer, :object_persister
   
   def setup
+    super
+    
     @factory_definer = FactoryDefiner.new
     @object_persister = PoroObjectPersister.new
   end

@@ -4,6 +4,8 @@ class GraphTest < TraverTest
   attr_reader :subject
   
   def setup
+    super
+    
     @subject = Graph.new
   end
   

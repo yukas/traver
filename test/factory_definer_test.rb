@@ -4,6 +4,8 @@ class FactoryDefinerTest < TraverTest
   attr_reader :subject
   
   def setup
+    super
+    
     @subject = FactoryDefiner.new
   end
   

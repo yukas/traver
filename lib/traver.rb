@@ -11,12 +11,8 @@ require "traver/object_persisters/poro_object_persister"
 module Traver
   class Error < Exception; end
   
-  def self.factory_definer
-    @factory_definer ||= FactoryDefiner.new
-  end
-  
-  def self.object_persister
-    @object_persister ||= PoroObjectPersister.new
+  class << self
+    attr_accessor :factory_definer, :object_persister
   end
   
   def self.factory(factory_name, *options)

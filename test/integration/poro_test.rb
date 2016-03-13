@@ -1,6 +1,12 @@
 require "test_helper"
 
 class PoroTest < TraverTest
+  def setup
+    super
+    
+    Traver.object_persister = PoroObjectPersister.new
+  end
+  
   def test_create_object
     define_class("Blog")
     

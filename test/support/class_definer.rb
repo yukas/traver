@@ -41,10 +41,14 @@ if __FILE__ == $0
     attr_reader :subject
     
     def setup
+      super
+      
       @subject = ClassDefiner.new
     end
     
     def teardown
+      super
+      
       subject.undefine_all_classes
     end
     

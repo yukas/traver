@@ -75,10 +75,14 @@ if __FILE__ == $0
     attr_reader :subject
     
     def setup
+      super
+      
       @subject = ModelDefiner.new
     end
     
     def teardown
+      super
+      
       subject.undefine_all_models
     end
     
