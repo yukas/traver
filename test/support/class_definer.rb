@@ -1,36 +1,34 @@
 class ClassDefiner
-  attr_reader :defined_class_names
+  attr_reader :defined_classes
   
   def initialize
-    @defined_class_names = []
+    @defined_classes = []
   end
   
   def define_class(class_name, *params)
     defined_class = if params.empty?
-      Object.const_set(camelize(class_name.to_s), Class.new)
+      Object.const_set(class_name, Class.new)
     else
-      Object.const_set(camelize(class_name.to_s), Struct.new(*params))
+      Object.const_set(class_name, Struct.new(*params))
     end
   
-    defined_class_names << class_name
+    defined_classes << defined_class
   
     defined_class
   end
 
   def undefine_all_classes
-    defined_class_names.each do |class_name|
-      undefine_class(class_name)
+    defined_classes.each do |klass|
+      undefine_class(klass)
     end
-  end
-
-  def undefine_class(class_name)
-    Object.send(:remove_const, camelize(class_name.to_s))
+    
+    @defined_classes = []
   end
   
   private
-  
-  def camelize(str)
-    str.split('_').map(&:capitalize).join
+
+  def undefine_class(klass)
+    Object.send(:remove_const, klass.name)
   end
 end
 
@@ -40,53 +38,36 @@ if __FILE__ == $0
   require "support/class_definer"
 
   class ClassDefinerTest < Minitest::Test
-    def test_defines_class
-      class_definer = ClassDefiner.new
+    attr_reader :subject
     
-      class_definer.define_class(:blog)
+    def setup
+      @subject = ClassDefiner.new
+    end
+    
+    def teardown
+      subject.undefine_all_classes
+    end
+    
+    def test_define_class
+      subject.define_class("Blog")
     
       assert defined?(Blog)
-    
-      Object.send(:remove_const, "Blog")
     end
-
-    def test_defines_class_with_camel_case
-      class_definer = ClassDefiner.new
     
-      class_definer.define_class(:blog_post)
-    
-      assert defined?(BlogPost)
-    
-      Object.send(:remove_const, "BlogPost")
+    def test_define_class_with_attributes
+      subject.define_class("Blog", :title)
+      
+      assert_includes Blog.instance_methods, :title
     end
-
-    def test_undefines_class
-      Object.const_set("Blog", Class.new)
-      class_definer = ClassDefiner.new
-
-      class_definer.undefine_class(:blog)
     
-      refute defined?(Blog)
-    end
-  
-    def test_undefine_defined_classes
-      class_definer = ClassDefiner.new
-    
-      class_definer.define_class(:blog)
-      class_definer.define_class(:post)
-      class_definer.undefine_all_classes
+    def test_undefine_all_classes
+      subject.define_class("Blog")
+      subject.define_class("Post")
+      
+      subject.undefine_all_classes
     
       refute defined?(Blog)
       refute defined?(Post)
-    end
-    
-    def test_undefine_classes_with_camel_case
-      class_definer = ClassDefiner.new
-      class_definer.define_class(:blog_post)
-      
-      class_definer.undefine_all_classes
-    
-      refute defined?(BlogPost)
     end
   end
 end

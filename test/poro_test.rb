@@ -2,7 +2,7 @@ require "test_helper"
 
 class IntegrationTest < TraverTest
   def test_create_object
-    define_class(:blog)
+    define_class("Blog")
     
     blog = Traver.create(:blog)
     
@@ -10,7 +10,7 @@ class IntegrationTest < TraverTest
   end
   
   def test_create_object_with_attributes
-    define_class(:blog, :title)
+    define_class("Blog", :title)
     
     blog = Traver.create(blog: { title: "Hello" })
     
@@ -18,7 +18,7 @@ class IntegrationTest < TraverTest
   end
   
   def test_create_object_with_a_factory
-    define_class(:post, :title)
+    define_class("Post", :title)
     Traver.factory(:post, { title: "Hello" })
   
     post = Traver.create(:post)
@@ -27,7 +27,7 @@ class IntegrationTest < TraverTest
   end
   
   def test_create_object_with_a_child_factory
-    define_class(:post, :title, :published)
+    define_class("Post", :title, :published)
     Traver.factory(:post, { title: "Hello" })
     Traver.factory(:published_post, :post, { published: true })
     
@@ -38,8 +38,8 @@ class IntegrationTest < TraverTest
   end
   
   def test_create_associated_object
-    define_class(:blog, :title, :user)
-    define_class(:user, :name)
+    define_class("Blog", :title, :user)
+    define_class("User", :name)
 
     blog = Traver.create(blog: {
       title: "Hello",
@@ -51,8 +51,8 @@ class IntegrationTest < TraverTest
  end
  
  def test_create_associated_collection
-   define_class(:blog, :title, :posts)
-   define_class(:post, :title)
+   define_class("Blog", :title, :posts)
+   define_class("Post", :title)
    
    blog = Traver.create(blog: {
      title: "Hello",
@@ -68,9 +68,9 @@ class IntegrationTest < TraverTest
  end
  
  def test_create_graph
-   define_class(:blog, :title, :posts)
-   define_class(:post, :title, :tags)
-   define_class(:tag,  :name)
+   define_class("Blog", :title, :posts)
+   define_class("Post", :title, :tags)
+   define_class("Tag",  :name)
    
    graph = Traver.create_graph(blog: {
      title: "Blog",
@@ -92,12 +92,11 @@ class IntegrationTest < TraverTest
  end
  
  def test_loads_factories_from_test_directory
-   define_class(:blog, :title)
-   define_class(:post, :title)
+   define_class("Blog", :title)
+   define_class("Post", :title)
    base_dir = File.join(Dir.pwd, "test", "support", "dummy")
    
    Traver.load_factories(base_dir, "test")
-   
    blog = Traver.create(:blog)
    post = Traver.create(:post)
    
@@ -106,11 +105,10 @@ class IntegrationTest < TraverTest
  end
  
  def test_loads_factories_from_spec_directory
-   define_class(:user, :name)
+   define_class("User", :name)
    base_dir = File.join(Dir.pwd, "test", "support", "dummy")
    
    Traver.load_factories(base_dir, "spec")
-   
    user = Traver.create(:user)
    
    assert_equal "Walter", user.name
