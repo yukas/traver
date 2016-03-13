@@ -1,3 +1,4 @@
+require "active_support"
 require "traver/version"
 require "traver/factory_definer"
 require "traver/object_creator"

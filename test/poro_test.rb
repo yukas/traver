@@ -1,8 +1,6 @@
 require "test_helper"
 
 class IntegrationTest < TraverTest
-  include ClassDefinerHelper
-  
   def test_create_object
     define_class(:blog)
     
@@ -19,7 +17,7 @@ class IntegrationTest < TraverTest
     assert_equal "Hello", blog.title
   end
   
-  def test_create_object_using_factory
+  def test_create_object_with_a_factory
     define_class(:post, :title)
     Traver.factory(:post, { title: "Hello" })
   
@@ -28,7 +26,7 @@ class IntegrationTest < TraverTest
     assert_equal "Hello", post.title
   end
   
-  def test_create_object_using_child_factory
+  def test_create_object_with_a_child_factory
     define_class(:post, :title, :published)
     Traver.factory(:post, { title: "Hello" })
     Traver.factory(:published_post, :post, { published: true })
