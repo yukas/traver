@@ -7,6 +7,8 @@ require "support/class_definer"
 require "support/model_definer"
 
 class TraverTest < Minitest::Test
+  include Traver
+  
   def define_class(*args)
     class_definer.define_class(*args)
   end
@@ -18,6 +20,7 @@ class TraverTest < Minitest::Test
   def teardown
     class_definer.undefine_all_classes
     model_definer.undefine_all_models
+    Traver.factory_definer.undefine_all_factories
   end
   
   private

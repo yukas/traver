@@ -1,14 +1,14 @@
 module Traver
   class ObjectCreator
-    attr_reader :factory_name, :params
-    attr_accessor :after_create
+    attr_reader :factory_name, :params, :factory_definer
     attr_reader :created_object
     
-    def initialize(options)
-      options = { options => {} } if options.is_a?(Symbol)
-      
-      @factory_name, @params = options.first
-      @factory_definer = FactoryDefiner.instance
+    attr_accessor :after_create
+    
+    def initialize(factory_name, params, factory_definer)
+      @factory_name = factory_name
+      @params = params
+      @factory_definer = factory_definer
     end
     
     def create_object
@@ -19,14 +19,17 @@ module Traver
     end
     
     private
-    attr_reader :factory_definer
-    
+
     def instantiate_object
       @created_object = get_class.new
     end
     
     def get_class
-      factory_definer.get_object_class(factory_name)
+      Object.const_get(factory.root_factory.name.to_s.camelize)
+    end
+    
+    def factory
+      @factory ||= factory_definer.factory_by_name(factory_name)
     end
     
     def set_object_state
@@ -40,9 +43,9 @@ module Traver
         end
       end
     end
-
+    
     def factory_params
-      factory_definer.apply_factory_params(factory_name, params)
+      factory.inherited_params.merge(params)
     end
     
     def nested_params?(params)
@@ -50,11 +53,11 @@ module Traver
     end
     
     def create_nested_object(k, v)
-      set_attribute(k, do_create_object(k => v))
+      set_attribute(k, do_create_object(k, v))
     end
     
-    def do_create_object(params)
-      object_creator = ObjectCreator.new(params)
+    def do_create_object(factory_name, params)
+      object_creator = ObjectCreator.new(factory_name, params, factory_definer)
       object_creator.after_create = after_create
       object_creator.create_object
       
@@ -71,7 +74,7 @@ module Traver
     
     def create_collection(attribute, collection_params)
       collection = collection_params.map do |params|
-        do_create_object(singularize(attribute) => params)
+        do_create_object(singularize(attribute), params)
       end
       
       set_attribute(attribute, collection)

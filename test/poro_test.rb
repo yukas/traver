@@ -1,6 +1,6 @@
 require "test_helper"
 
-class IntegrationTest < TraverTest
+class PoroTest < TraverTest
   def test_create_object
     define_class("Blog")
     

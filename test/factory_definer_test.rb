@@ -1,8 +1,6 @@
 require "test_helper"
 
 class FactoryDefinerTest < TraverTest
-  include ClassDefinerHelper
-  
   attr_reader :subject
   
   def setup
@@ -10,68 +8,36 @@ class FactoryDefinerTest < TraverTest
   end
   
   def test_define_factory
-    subject.define_factory(:post, title: "Hello")
+    subject.define_factory(:post, nil, title: "Hello")
     
-    assert_equal Hash[
-      post: {
-        params: { title: "Hello" },
-        parent: nil
-      }
-    ], subject.defined_factories
-  end
-  
-  def test_undefine_all_factories
-    subject.define_factory(:post, title: "Hello")
-    
-    subject.undefine_all_factories
-    
-    assert_equal Hash.new, subject.defined_factories
+    assert_equal Hash[{ title: "Hello" }], subject.factory_params(:post)
+    assert_equal nil, subject.parent_factory_name(:post)
   end
   
   def test_define_factory_with_a_parent
     subject.define_factory(:published_post, :post, published: true)
     
-    assert_equal Hash[
-      published_post: {
-        params: { published: true },
-        parent: :post
-      }
-    ], subject.defined_factories
+    assert_equal Hash[{
+      published: true
+    }], subject.factory_params(:published_post)
+    
+    assert_equal :post,
+      subject.parent_factory_name(:published_post)
   end
   
-  def test_apply_factory_params
-    subject.define_factory(:post, title: "Hello")
+  def test_factory_by_name
+    subject.define_factory(:post, nil, published: true)
     
-    result = subject.apply_factory_params(:post, {})
+    factory = subject.factory_by_name(:post)
     
-    assert_equal Hash[title: "Hello"], result
+    assert_equal Hash[{ published: true }], factory.params
   end
   
-  def test_merge_parent_factory_params
-    subject.define_factory(:post, title: "Hello")
-    subject.define_factory(:tagged_post, :post, tags: "tag")
-    subject.define_factory(:published_post, :tagged_post, published: true)
+  def test_undefine_all_factories
+    subject.define_factory(:post, nil, title: "Hello")
     
-    result = subject.apply_factory_params(:published_post, {})
+    subject.undefine_all_factories
     
-    assert_equal Hash[title: "Hello", tags: "tag", published: true], result
-  end
-  
-  def test_get_object_class
-    define_class(:post)
-    
-    subject.define_factory(:post, title: "Hello")
-    subject.define_factory(:tagged_post, :post, tags: "tag")
-    subject.define_factory(:published_post, :tagged_post, published: true)
-    
-    assert_equal Post, subject.get_object_class(:published_post)
-  end
-  
-  def test_get_object_class_camel_case
-    define_class(:blog_post)
-    
-    subject.define_factory(:blog_post, title: "Hello")
-    
-    assert_equal BlogPost, subject.get_object_class(:blog_post)
+    assert_equal 0, subject.factories_count
   end
 end

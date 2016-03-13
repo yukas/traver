@@ -1,6 +1,7 @@
-require "active_support"
+require "active_support/inflector"
 require "traver/version"
 require "traver/factory_definer"
+require "traver/factory"
 require "traver/object_creator"
 require "traver/graph"
 require "traver/graph_creator"
@@ -8,20 +9,35 @@ require "traver/graph_creator"
 module Traver
   class Error < Exception; end
   
+  def self.factory_definer
+    @factory_definer ||= FactoryDefiner.new
+  end
+  
   def self.factory(factory_name, *options)
-    factory_definer = FactoryDefiner.instance
-    factory_definer.define_factory(factory_name, *options)
+    parent_name = nil
+    
+    if options.size == 1
+      params = options.first
+    elsif options.size == 2
+      parent_name, params = options
+    end
+    
+    factory_definer.define_factory(factory_name, parent_name, params)
   end
   
   def self.create(options)
-    object_creator = ObjectCreator.new(options)
+    options = { options => {} } if options.is_a?(Symbol)
+    
+    object_creator = ObjectCreator.new(*options.first, factory_definer)
     object_creator.create_object
     
     object_creator.created_object
   end
   
-  def self.create_graph(params = {})
-    graph_creator = GraphCreator.new(params)
+  def self.create_graph(options)
+    options = { options => {} } if options.is_a?(Symbol)
+    
+    graph_creator = GraphCreator.new(*options.first, factory_definer)
     graph_creator.create_graph
     
     graph_creator.graph

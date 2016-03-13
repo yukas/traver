@@ -1,11 +1,10 @@
 require "test_helper"
 
 class GraphCreatorTest < TraverTest
-  include ClassDefinerHelper
-  
   def test_create_graph
-    define_class(:blog, :title)
-    graph_creator = GraphCreator.new(blog: {title: "Hello"})
+    define_class("Blog", :title)
+    factory_definer = FactoryDefiner.new
+    graph_creator = GraphCreator.new(:blog,  {title: "Hello"}, factory_definer)
     
     graph_creator.create_graph
     
