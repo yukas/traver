@@ -26,7 +26,7 @@ class ActiveRecordTest < TraverTest
 
   def test_create_object_using_factory
     define_model("Post", title: :string)
-    Traver.factory(:post, { title: "Hello" })
+    Traver.define_factory(:post, { title: "Hello" })
 
     post = Traver.create(:post)
 
@@ -37,8 +37,8 @@ class ActiveRecordTest < TraverTest
   def test_create_object_using_child_factory
     define_model("Post", title: :string, published: :boolean)
 
-    Traver.factory(:post, { title: "Hello" })
-    Traver.factory(:published_post, :post, { published: true })
+    Traver.define_factory(:post, { title: "Hello" })
+    Traver.define_factory(:published_post, :post, { published: true })
 
     post = Traver.create(:published_post)
 

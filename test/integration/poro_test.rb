@@ -25,7 +25,7 @@ class PoroTest < TraverTest
   
   def test_create_object_with_a_factory
     define_class("Post", :title)
-    Traver.factory(:post, { title: "Hello" })
+    Traver.define_factory(:post, { title: "Hello" })
   
     post = Traver.create(:post)
   
@@ -34,8 +34,8 @@ class PoroTest < TraverTest
   
   def test_create_object_with_a_child_factory
     define_class("Post", :title, :published)
-    Traver.factory(:post, { title: "Hello" })
-    Traver.factory(:published_post, :post, { published: true })
+    Traver.define_factory(:post, { title: "Hello" })
+    Traver.define_factory(:published_post, :post, { published: true })
     
     post = Traver.create(:published_post)
     

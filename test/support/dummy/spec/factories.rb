@@ -1,3 +1,3 @@
-Traver.factory(:user, {
+Traver.define_factory(:user, {
   name: "Walter"
 })

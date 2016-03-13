@@ -15,7 +15,7 @@ module Traver
     attr_accessor :factory_definer, :object_persister
   end
   
-  def self.factory(factory_name, *options)
+  def self.define_factory(factory_name, *options)
     parent_name = nil
     
     if options.size == 1
