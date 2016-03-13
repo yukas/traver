@@ -13,7 +13,7 @@ module Traver
       key = key.to_s
       
       if plural?(key)
-        vertices[singularize(key).to_sym]
+        vertices[key.singularize.to_sym]
       else
         name, index = key.split(/(\d+)$/)
         index = (index || 1).to_i
@@ -30,11 +30,7 @@ module Traver
     attr_reader :vertices
     
     def plural?(value)
-      value.end_with?("s")
-    end
-    
-    def singularize(value)
-      value.chomp("s")
+      value == value.pluralize
     end
   end
 end

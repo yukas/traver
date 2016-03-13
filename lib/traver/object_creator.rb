@@ -75,14 +75,10 @@ module Traver
     
     def create_collection(attribute, collection_params)
       collection = collection_params.map do |params|
-        do_create_object(singularize(attribute), params)
+        do_create_object(attribute.to_s.singularize.to_sym, params)
       end
       
       set_attribute(attribute, collection)
-    end
-    
-    def singularize(val)
-      val.to_s.chomp("s").to_sym
     end
     
     def persist_object

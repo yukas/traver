@@ -29,7 +29,7 @@ module Traver
   end
   
   def self.create(options)
-    factories_loader.load_factories
+    load_factories
     
     options = { options => {} } if options.is_a?(Symbol)
     
@@ -40,7 +40,7 @@ module Traver
   end
   
   def self.create_graph(options)
-    factories_loader.load_factories
+    load_factories
     
     options = { options => {} } if options.is_a?(Symbol)
     
@@ -49,5 +49,19 @@ module Traver
     graph_creator.create_graph
     
     graph_creator.graph
+  end
+  
+  def self.load_factories
+    if defined?(Rails)
+      loader = FactoriesLoader.new(Rails.root, "spec")
+      loader.load_factories
+    else
+      factories_loader.load_factories
+    end
+  end
+  
+  if defined?(Rails)
+    self.factory_definer = FactoryDefiner.new
+    self.object_persister = ActiveRecordObjectPersister.new
   end
 end
