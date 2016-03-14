@@ -9,6 +9,7 @@ require "traver/object_persisters/active_record_object_persister"
 require "traver/object_persisters/poro_object_persister"
 require "traver/factories_loader"
 require "traver/nested_object_resolvers/poro_nested_object_resolver"
+require "traver/nested_object_resolvers/active_record_nested_object_resolver"
 
 module Traver
   class Error < Exception; end
@@ -64,5 +65,6 @@ module Traver
   if defined?(Rails)
     self.factory_definer = FactoryDefiner.new
     self.object_persister = ActiveRecordObjectPersister.new
+    self.nested_object_resolver = ActiveRecordNestedObjectResolver.new
   end
 end
