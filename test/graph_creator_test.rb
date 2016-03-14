@@ -1,14 +1,16 @@
 require "test_helper"
 
 class GraphCreatorTest < TraverTest
-  attr_reader :factory_definer, :object_persister, :object_creator
+  attr_reader :factory_definer, :object_persister, :object_creator, :nested_object_resolver
   
   def setup
     super
     
     @factory_definer = FactoryDefiner.new
     @object_persister = PoroObjectPersister.new
-    @object_creator = ObjectCreator.new(:blog,  { title: "Hello" }, factory_definer, object_persister)
+    @object_persister = PoroObjectPersister.new
+    @nested_object_resolver = PoroNestedObjectResolver.new
+    @object_creator = ObjectCreator.new(:blog,  { title: "Hello" }, factory_definer, object_persister, nested_object_resolver)
   end
   
   def test_create_graph

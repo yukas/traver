@@ -8,12 +8,13 @@ require "traver/graph_creator"
 require "traver/object_persisters/active_record_object_persister"
 require "traver/object_persisters/poro_object_persister"
 require "traver/factories_loader"
+require "traver/nested_object_resolvers/poro_nested_object_resolver"
 
 module Traver
   class Error < Exception; end
   
   class << self
-    attr_accessor :factory_definer, :object_persister, :factories_loader
+    attr_accessor :factory_definer, :object_persister, :factories_loader, :nested_object_resolver
   end
   
   def self.define_factory(factory_name, *options)
@@ -33,7 +34,7 @@ module Traver
     
     options = { options => {} } if options.is_a?(Symbol)
     
-    object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister)
+    object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister, nested_object_resolver)
     object_creator.create_object
     
     object_creator.created_object
@@ -44,7 +45,7 @@ module Traver
     
     options = { options => {} } if options.is_a?(Symbol)
     
-    object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister)
+    object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister, nested_object_resolver)
     graph_creator = GraphCreator.new(object_creator)
     graph_creator.create_graph
     

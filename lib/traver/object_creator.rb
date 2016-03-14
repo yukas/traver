@@ -1,15 +1,16 @@
 module Traver
   class ObjectCreator
-    attr_reader :factory_name, :params, :factory_definer, :object_persister
+    attr_reader :factory_name, :params, :factory_definer, :object_persister, :nested_object_resolver
     attr_reader :created_object
     
     attr_accessor :after_create
     
-    def initialize(factory_name, params, factory_definer, object_persister)
+    def initialize(factory_name, params, factory_definer, object_persister, nested_object_resolver)
       @factory_name = factory_name
       @params = params
       @factory_definer = factory_definer
       @object_persister = object_persister
+      @nested_object_resolver = nested_object_resolver
     end
     
     def create_object
@@ -34,13 +35,13 @@ module Traver
     end
     
     def set_object_state
-      factory_params.each do |attribute, value|
-        if nested_params?(value)
-          create_nested_object(attribute, value)
-        elsif collection_params?(value)
-          create_collection(attribute, value)
+      factory_params.each do |field_name, field_value|
+        if nested_object?(field_name, field_value)
+          create_nested_object(field_name, field_value)
+        elsif collection_params?(field_value)
+          create_collection(field_name, field_value)
         else
-          set_attribute(attribute, value)
+          set_attribute(field_name, field_value)
         end
       end
     end
@@ -49,8 +50,8 @@ module Traver
       factory.inherited_params.merge(params)
     end
     
-    def nested_params?(params)
-      params.is_a?(Hash)
+    def nested_object?(field_name, field_value)
+      nested_object_resolver.nested_object?(get_class, field_name, field_value)
     end
     
     def create_nested_object(k, v)
@@ -58,7 +59,7 @@ module Traver
     end
     
     def do_create_object(factory_name, params)
-      object_creator = ObjectCreator.new(factory_name, params, factory_definer, object_persister)
+      object_creator = ObjectCreator.new(factory_name, params, factory_definer, object_persister, nested_object_resolver)
       object_creator.after_create = after_create
       object_creator.create_object
       
