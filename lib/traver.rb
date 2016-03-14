@@ -10,12 +10,14 @@ require "traver/object_persisters/poro_object_persister"
 require "traver/factories_loader"
 require "traver/nested_object_resolvers/poro_nested_object_resolver"
 require "traver/nested_object_resolvers/active_record_nested_object_resolver"
+require "traver/nested_collection_resolvers/active_record_nested_collection_resolver"
+require "traver/nested_collection_resolvers/poro_nested_collection_resolver"
 
 module Traver
   class Error < Exception; end
   
   class << self
-    attr_accessor :factory_definer, :object_persister, :factories_loader, :nested_object_resolver
+    attr_accessor :factory_definer, :object_persister, :factories_loader, :nested_object_resolver, :nested_collection_resolver
   end
   
   def self.define_factory(factory_name, *options)
@@ -35,7 +37,7 @@ module Traver
     
     options = { options => {} } if options.is_a?(Symbol)
     
-    object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister, nested_object_resolver)
+    object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister, nested_object_resolver, nested_collection_resolver)
     object_creator.create_object
     
     object_creator.created_object
@@ -46,7 +48,7 @@ module Traver
     
     options = { options => {} } if options.is_a?(Symbol)
     
-    object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister, nested_object_resolver)
+    object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister, nested_object_resolver, nested_collection_resolver)
     graph_creator = GraphCreator.new(object_creator)
     graph_creator.create_graph
     
@@ -66,5 +68,6 @@ module Traver
     self.factory_definer = FactoryDefiner.new
     self.object_persister = ActiveRecordObjectPersister.new
     self.nested_object_resolver = ActiveRecordNestedObjectResolver.new
+    self.nested_collection_resolver = ActiveRecordNestedCollectionResolver.new
   end
 end

@@ -24,6 +24,7 @@ class TraverTest < Minitest::Test
     Traver.object_persister = PoroObjectPersister.new
     Traver.factories_loader = NilFactoriesLoader.new
     Traver.nested_object_resolver = PoroNestedObjectResolver.new
+    Traver.nested_collection_resolver = PoroNestedCollectionResolver.new
   end
   
   def teardown

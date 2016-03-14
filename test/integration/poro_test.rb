@@ -91,7 +91,7 @@ class PoroTest < TraverTest
    assert_equal "Tag", graph.tags.first.name
  end
  
- def test_assign_hash_to_field_if_there_are_no_constant_defined
+ def test_assign_hash_if_no_constant_defined
    define_class("Blog", :title, :user)
    
    blog = Traver.create(blog: {
@@ -100,5 +100,18 @@ class PoroTest < TraverTest
    })
    
    assert_equal Hash[{ name: "Mike" }], blog.user
+ end
+ 
+ def test_assign_array_if_no_constant_defined
+   define_class("Blog", :title, :posts)
+   
+   blog = Traver.create(blog: {
+     title: "Blog",
+     posts: [
+       { title: "Post" }
+     ]
+   })
+   
+   assert_equal [{ title: "Post" }], blog.posts
  end
 end

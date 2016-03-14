@@ -1,16 +1,19 @@
 module Traver
   class ObjectCreator
-    attr_reader :factory_name, :params, :factory_definer, :object_persister, :nested_object_resolver
+    attr_reader :factory_name, :params, :factory_definer,
+                :object_persister, :nested_object_resolver,
+                :nested_collection_resolver
     attr_reader :created_object
     
     attr_accessor :after_create
     
-    def initialize(factory_name, params, factory_definer, object_persister, nested_object_resolver)
+    def initialize(factory_name, params, factory_definer, object_persister, nested_object_resolver, nested_collection_resolver)
       @factory_name = factory_name
       @params = params
       @factory_definer = factory_definer
       @object_persister = object_persister
       @nested_object_resolver = nested_object_resolver
+      @nested_collection_resolver = nested_collection_resolver
     end
     
     def create_object
@@ -38,7 +41,7 @@ module Traver
       factory_params.each do |field_name, field_value|
         if nested_object?(field_name, field_value)
           create_nested_object(field_name, field_value)
-        elsif collection_params?(field_value)
+        elsif nested_collection?(field_name, field_value)
           create_collection(field_name, field_value)
         else
           set_attribute(field_name, field_value)
@@ -59,7 +62,7 @@ module Traver
     end
     
     def do_create_object(factory_name, params)
-      object_creator = ObjectCreator.new(factory_name, params, factory_definer, object_persister, nested_object_resolver)
+      object_creator = ObjectCreator.new(factory_name, params, factory_definer, object_persister, nested_object_resolver, nested_collection_resolver)
       object_creator.after_create = after_create
       object_creator.create_object
       
@@ -70,8 +73,8 @@ module Traver
       created_object.public_send("#{attribute}=", value)
     end
     
-    def collection_params?(params)
-      params.is_a?(Array)
+    def nested_collection?(field_name, field_value)
+      nested_collection_resolver.nested_collection?(get_class, field_name, field_value)
     end
     
     def create_collection(attribute, collection_params)

@@ -6,6 +6,7 @@ class ActiveRecordTest < TraverTest
     
     Traver.object_persister = ActiveRecordObjectPersister.new
     Traver.nested_object_resolver = ActiveRecordNestedObjectResolver.new
+    Traver.nested_collection_resolver = ActiveRecordNestedCollectionResolver.new
   end
   
   def test_create_object
@@ -125,7 +126,7 @@ class ActiveRecordTest < TraverTest
    assert_equal true, blog.posts.first.tags.first.persisted?
  end
  
- def test_assign_hash_to_field_if_there_are_no_constant_defined
+ def test_assign_hash_if_no_association_exists
    define_model("Blog", title: :string, user: :string) do
      serialize :user, Hash
    end
@@ -136,5 +137,20 @@ class ActiveRecordTest < TraverTest
    })
    
    assert_equal Hash[{ name: "Mike" }], blog.user
+ end
+ 
+ def test_assign_array_if_no_association_exists
+   define_model("Blog", title: :string, posts: :string) do
+     serialize :posts, Array
+   end
+   
+   blog = Traver.create(blog: {
+     title: "Blog",
+     posts: [
+       { title: "Post" }
+     ]
+   })
+   
+   assert_equal [{ title: "Post" }], blog.posts
  end
 end
