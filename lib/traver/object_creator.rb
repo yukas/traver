@@ -24,44 +24,61 @@ module Traver
     end
     
     private
+    attr_reader :factory, :factory_params, :object_class
 
     def instantiate_object
-      @created_object = get_class.new
-    end
-    
-    def get_class
-      Object.const_get(factory.root_factory.name.to_s.camelize)
-    end
-    
-    def factory
-      @factory ||= factory_definer.factory_by_name(factory_name)
+      @factory = factory_definer.factory_by_name(factory_name)
+      @factory_params = factory.inherited_params.merge(params)
+      @object_class = Object.const_get(factory.root_factory.name.to_s.camelize)
+      @created_object = object_class.new
     end
     
     def set_object_state
-      factory_params.each do |field_name, field_value|
-        if nested_object?(field_name, field_value)
-          create_nested_object(field_name, field_value)
-        elsif nested_collection?(field_name, field_value)
-          create_collection(field_name, field_value)
-        else
-          set_attribute(field_name, field_value)
-        end
+      set_attributes
+      set_nested_objects
+      set_nested_collections
+    end
+
+    # Attributes
+    
+    def set_attributes
+      attributes_params.each { |name, value| set_attribute(name, value) }
+    end
+    
+    def attributes_params
+      factory_params.select { |k, v| regular_attribute?(k, v) }
+    end
+    
+    def regular_attribute?(field_name, field_value)
+      !nested_object?(field_name, field_value) && !nested_collection?(field_name, field_value)
+    end
+    
+    def set_attribute(attribute, value)
+      created_object.public_send("#{attribute}=", value)
+    end
+    
+    
+    # Nested Objects
+    
+    def set_nested_objects
+      nested_objects_params.each do |field_name, field_value|
+        set_nested_object(field_name, field_value)
       end
     end
     
-    def factory_params
-      factory.inherited_params.merge(params)
+    def nested_objects_params
+      factory_params.select { |k, v| nested_object?(k, v) }
     end
     
     def nested_object?(field_name, field_value)
-      nested_object_resolver.nested_object?(get_class, field_name, field_value)
+      nested_object_resolver.nested_object?(object_class, field_name, field_value)
     end
     
-    def create_nested_object(k, v)
-      set_attribute(k, do_create_object(k, v))
+    def set_nested_object(k, v)
+      set_attribute(k, create_nested_object(k, v))
     end
     
-    def do_create_object(factory_name, params)
+    def create_nested_object(factory_name, params)
       object_creator = ObjectCreator.new(factory_name, params, factory_definer, object_persister, nested_object_resolver, nested_collection_resolver)
       object_creator.after_create = after_create
       object_creator.create_object
@@ -69,20 +86,31 @@ module Traver
       object_creator.created_object
     end
     
-    def set_attribute(attribute, value)
-      created_object.public_send("#{attribute}=", value)
+    
+    # Nested Collections
+    
+    def set_nested_collections
+      nested_collections_params.each do |name, value|
+        set_nested_collection(name, value)
+      end
+    end
+    
+    def nested_collections_params
+      factory_params.select { |k, v| nested_collection?(k, v) }
     end
     
     def nested_collection?(field_name, field_value)
-      nested_collection_resolver.nested_collection?(get_class, field_name, field_value)
+      nested_collection_resolver.nested_collection?(object_class, field_name, field_value)
     end
     
-    def create_collection(attribute, collection_params)
-      collection = collection_params.map do |params|
-        do_create_object(attribute.to_s.singularize.to_sym, params)
+    def set_nested_collection(attribute, collection_params)
+      set_attribute(attribute, create_nested_collection(attribute, collection_params))
+    end
+    
+    def create_nested_collection(factory_name, collection_params)
+      collection_params.map do |params|
+        create_nested_object(factory_name.to_s.singularize.to_sym, params)
       end
-      
-      set_attribute(attribute, collection)
     end
     
     def persist_object
