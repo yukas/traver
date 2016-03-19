@@ -1,19 +1,23 @@
+require "forwardable"
+
 module Traver
   class ObjectCreator
-    attr_reader :factory_name, :params, :factory_definer,
-                :object_persister, :nested_object_resolver,
-                :nested_collection_resolver
+    extend Forwardable
+    
+    attr_reader :factory_name, :params, :settings
     attr_reader :created_object
     
     attr_accessor :after_create
     
-    def initialize(factory_name, params, factory_definer, object_persister, nested_object_resolver, nested_collection_resolver)
+    def_delegators :settings, :factory_definer,
+                              :object_persister,
+                              :nested_object_resolver,
+                              :nested_collection_resolver
+    
+    def initialize(factory_name, params, settings)
       @factory_name = factory_name
-      @params = params
-      @factory_definer = factory_definer
-      @object_persister = object_persister
-      @nested_object_resolver = nested_object_resolver
-      @nested_collection_resolver = nested_collection_resolver
+      @params       = params
+      @settings     = settings
     end
     
     def create_object
@@ -79,7 +83,7 @@ module Traver
     end
     
     def create_nested_object(factory_name, params)
-      object_creator = ObjectCreator.new(factory_name, params, factory_definer, object_persister, nested_object_resolver, nested_collection_resolver)
+      object_creator = ObjectCreator.new(factory_name, params, settings)
       object_creator.after_create = after_create
       object_creator.create_object
       

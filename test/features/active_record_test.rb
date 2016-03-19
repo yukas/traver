@@ -1,18 +1,14 @@
 require "test_helper"
 
 class ActiveRecordTest < TraverTest
-  def setup
-    super
-    
-    Traver.object_persister = ActiveRecordObjectPersister.new
-    Traver.nested_object_resolver = ActiveRecordNestedObjectResolver.new
-    Traver.nested_collection_resolver = ActiveRecordNestedCollectionResolver.new
+  def subject
+    @subject ||= TraverConstructor.new(ActiveRecordSettings.new)
   end
   
   def test_create_object
     define_model("Blog")
 
-    blog = Traver.create(:blog)
+    blog = subject.create(:blog)
 
     assert_equal true, blog.persisted?
   end
@@ -20,7 +16,7 @@ class ActiveRecordTest < TraverTest
   def test_create_object_with_attributes
     define_model("Blog", title: :string)
 
-    blog = Traver.create(blog: { title: "Hello" })
+    blog = subject.create(blog: { title: "Hello" })
 
     assert_equal "Hello", blog.title
     assert_equal true, blog.persisted?
@@ -28,9 +24,9 @@ class ActiveRecordTest < TraverTest
 
   def test_create_object_using_factory
     define_model("Post", title: :string)
-    Traver.define_factory(:post, { title: "Hello" })
+    subject.define_factory(:post, { title: "Hello" })
 
-    post = Traver.create(:post)
+    post = subject.create(:post)
 
     assert_equal "Hello", post.title
     assert_equal true, post.persisted?
@@ -39,10 +35,10 @@ class ActiveRecordTest < TraverTest
   def test_create_object_using_child_factory
     define_model("Post", title: :string, published: :boolean)
 
-    Traver.define_factory(:post, { title: "Hello" })
-    Traver.define_factory(:published_post, :post, { published: true })
+    subject.define_factory(:post, { title: "Hello" })
+    subject.define_factory(:published_post, :post, { published: true })
 
-    post = Traver.create(:published_post)
+    post = subject.create(:published_post)
 
     assert_equal "Hello", post.title
     assert_equal true, post.published
@@ -56,7 +52,7 @@ class ActiveRecordTest < TraverTest
       belongs_to :user
     end
 
-    blog = Traver.create(blog: {
+    blog = subject.create(blog: {
       title: "Hello",
       user: { name: "Mike" }
     })
@@ -76,7 +72,7 @@ class ActiveRecordTest < TraverTest
       belongs_to :blog
     end
 
-    blog = Traver.create(blog: {
+    blog = subject.create(blog: {
       title: "Hello",
       posts: [
         { title: "Post #1" },
@@ -108,7 +104,7 @@ class ActiveRecordTest < TraverTest
       belongs_to :post
     end
      
-    blog = Traver.create(blog: {
+    blog = subject.create(blog: {
       title: "Blog",
       posts: [{
         title: "Hello",
@@ -131,7 +127,7 @@ class ActiveRecordTest < TraverTest
       serialize :user, Hash
     end
     
-    blog = Traver.create(blog: {
+    blog = subject.create(blog: {
       title: "Hello",
       user: { name: "Mike" }
     })
@@ -144,7 +140,7 @@ class ActiveRecordTest < TraverTest
       serialize :posts, Array
     end
     
-    blog = Traver.create(blog: {
+    blog = subject.create(blog: {
       title: "Blog",
       posts: [
         { title: "Post" }
@@ -163,7 +159,7 @@ class ActiveRecordTest < TraverTest
   #     belongs_to :blog
   #   end
   #
-  #   post = Traver.create(:post)
+  #   post = subject.create(:post)
   #
   #   assert_equal true, post.persisted?
   #   assert_equal true, post.blog.persisted?
@@ -178,15 +174,15 @@ class ActiveRecordTest < TraverTest
   #     belongs_to :user
   #   end
   #
-  #   Traver.define_factory :user, {
+  #   subject.define_factory :user, {
   #     emails: [{ }]
   #   }
   #
-  #   Traver.define_factory :email, {
+  #   subject.define_factory :email, {
   #     address: "walter@white.com"
   #   }
   #
-  #   user = Traver.create(:user)
+  #   user = subject.create(:user)
   #
   #   assert_equal user.emails.first.user, user
   # end

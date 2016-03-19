@@ -1,10 +1,14 @@
 require "test_helper"
 
 class PoroTest < TraverTest  
+  def subject
+    @subject ||= TraverConstructor.new(PoroSettings.new)
+  end
+  
   def test_create_object
     define_class("Blog")
     
-    blog = Traver.create(:blog)
+    blog = subject.create(:blog)
     
     assert_instance_of Blog, blog
   end
@@ -12,26 +16,26 @@ class PoroTest < TraverTest
   def test_create_object_with_attributes
     define_class("Blog", :title)
     
-    blog = Traver.create(blog: { title: "Hello" })
+    blog = subject.create(blog: { title: "Hello" })
     
     assert_equal "Hello", blog.title
   end
   
   def test_create_object_with_a_factory
     define_class("Post", :title)
-    Traver.define_factory(:post, { title: "Hello" })
+    subject.define_factory(:post, { title: "Hello" })
   
-    post = Traver.create(:post)
+    post = subject.create(:post)
   
     assert_equal "Hello", post.title
   end
   
   def test_create_object_with_a_child_factory
     define_class("Post", :title, :published)
-    Traver.define_factory(:post, { title: "Hello" })
-    Traver.define_factory(:published_post, :post, { published: true })
+    subject.define_factory(:post, { title: "Hello" })
+    subject.define_factory(:published_post, :post, { published: true })
     
-    post = Traver.create(:published_post)
+    post = subject.create(:published_post)
     
     assert_equal "Hello", post.title
     assert_equal true, post.published
@@ -41,7 +45,7 @@ class PoroTest < TraverTest
     define_class("Blog", :title, :user)
     define_class("User", :name)
 
-    blog = Traver.create(blog: {
+    blog = subject.create(blog: {
       title: "Hello",
       user: { name: "Mike" }
     })
@@ -54,7 +58,7 @@ class PoroTest < TraverTest
    define_class("Blog", :title, :posts)
    define_class("Post", :title)
    
-   blog = Traver.create(blog: {
+   blog = subject.create(blog: {
      title: "Hello",
      posts: [
        { title: "Post #1" },
@@ -72,7 +76,7 @@ class PoroTest < TraverTest
    define_class("Post", :title, :tags)
    define_class("Tag",  :name)
    
-   graph = Traver.create_graph(blog: {
+   graph = subject.create_graph(blog: {
      title: "Blog",
      posts: [{
        title: "Hello",
@@ -94,7 +98,7 @@ class PoroTest < TraverTest
  def test_assign_hash_if_no_constant_defined
    define_class("Blog", :title, :user)
    
-   blog = Traver.create(blog: {
+   blog = subject.create(blog: {
      title: "Hello",
      user: { name: "Mike" }
    })
@@ -105,7 +109,7 @@ class PoroTest < TraverTest
  def test_assign_array_if_no_constant_defined
    define_class("Blog", :title, :posts)
    
-   blog = Traver.create(blog: {
+   blog = subject.create(blog: {
      title: "Blog",
      posts: [
        { title: "Post" }

@@ -17,23 +17,13 @@ class TraverTest < Minitest::Test
     model_definer.define_model(*args, &block)
   end
   
-  def setup
-    super
-    
-    Traver.factory_definer = FactoryDefiner.new
-    Traver.object_persister = PoroObjectPersister.new
-    Traver.factories_loader = NilFactoriesLoader.new
-    Traver.nested_object_resolver = PoroNestedObjectResolver.new
-    Traver.nested_collection_resolver = PoroNestedCollectionResolver.new
-  end
-  
   def teardown
     super
     
     class_definer.undefine_all_classes
     model_definer.undefine_all_models
     
-    Traver.factory_definer.undefine_all_factories
+    Traver.undefine_all_factories
   end
   
   private

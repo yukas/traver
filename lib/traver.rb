@@ -12,62 +12,50 @@ require "traver/nested_object_resolvers/poro_nested_object_resolver"
 require "traver/nested_object_resolvers/active_record_nested_object_resolver"
 require "traver/nested_collection_resolvers/active_record_nested_collection_resolver"
 require "traver/nested_collection_resolvers/poro_nested_collection_resolver"
+require "traver/traver_constructor"
+require "traver/settings/poro_settings"
+require "traver/settings/active_record_settings"
 
 module Traver
   class Error < Exception; end
   
   class << self
-    attr_accessor :factory_definer, :object_persister, :factories_loader, :nested_object_resolver, :nested_collection_resolver
-  end
+    def define_factory(factory_name, *options)
+      traver_constructor.define_factory(factory_name, *options)
+    end
   
-  def self.define_factory(factory_name, *options)
-    parent_name = nil
-    
-    if options.size == 1
-      params = options.first
-    elsif options.size == 2
-      parent_name, params = options
+    def create(options)
+      traver_constructor.create(options)
+    end
+  
+    def create_graph(options)
+      traver_constructor.create_graph(options)
     end
     
-    factory_definer.define_factory(factory_name, parent_name, params)
-  end
-  
-  def self.create(options)
-    load_factories
-    
-    options = { options => {} } if options.is_a?(Symbol)
-    
-    object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister, nested_object_resolver, nested_collection_resolver)
-    object_creator.create_object
-    
-    object_creator.created_object
-  end
-  
-  def self.create_graph(options)
-    load_factories
-    
-    options = { options => {} } if options.is_a?(Symbol)
-    
-    object_creator = ObjectCreator.new(*options.first, factory_definer, object_persister, nested_object_resolver, nested_collection_resolver)
-    graph_creator = GraphCreator.new(object_creator)
-    graph_creator.create_graph
-    
-    graph_creator.graph
-  end
-  
-  def self.load_factories
-    if defined?(Rails)
-      loader = FactoriesLoader.new(Rails.root, "spec")
-      loader.load_factories
-    else
-      factories_loader.load_factories
+    def undefine_all_factories
+      traver_constructor.undefine_all_factories
     end
-  end
-  
-  if defined?(Rails)
-    self.factory_definer = FactoryDefiner.new
-    self.object_persister = ActiveRecordObjectPersister.new
-    self.nested_object_resolver = ActiveRecordNestedObjectResolver.new
-    self.nested_collection_resolver = ActiveRecordNestedCollectionResolver.new
+    
+    private
+    
+    def traver_constructor
+      @traver_constructor ||= TraverConstructor.new(settings)
+    end
+    
+    def settings
+      if defined?(Rails)
+        RailsSettings.new
+      else
+        PoroSettings.new
+      end
+    end
+    
+    def factories_loader
+      if defined?(Rails)
+        FactoriesLoader.new(Rails.root, "spec")
+      else
+        NilFactoriesLoader.new
+      end
+    end
   end
 end
