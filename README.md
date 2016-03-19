@@ -124,6 +124,21 @@ blog, post = Traver.create_graph(blog: { posts: 1 })[:blog, :post]
 ## Rails
 By default Traver loads factories from`test/factories.rb` or `spec/factories.rb` for rspec users.
 
+Objects for `belongs_to` associations are created automatically:
+
+```ruby
+class Blog < ActiveRecord::Base
+  has_many :blogs
+end
+
+class Post < ActiveRecord::Base
+  belongs_to :blog
+end
+
+post = Traver.create(:post) #=> #<Post>
+post.blog #=> #<Blog>
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
