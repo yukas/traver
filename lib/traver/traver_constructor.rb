@@ -26,7 +26,7 @@ module Traver
       object_creator = ObjectCreator.new(factory_name, params, settings)
       object_creator.create_object
     
-      object_creator.created_object
+      object_creator.object
     end
     
     def create_graph(options)

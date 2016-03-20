@@ -19,5 +19,13 @@ module Traver
         params
       end
     end
+    
+    def object_class_name
+      root_factory.name.to_s.camelize
+    end
+    
+    def object_class
+      Object.const_get(object_class_name)
+    end
   end
 end

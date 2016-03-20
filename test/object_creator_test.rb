@@ -19,7 +19,7 @@ class ObjectCreatorTest < TraverTest
     
     subject.create_object
     
-    assert_equal "Hello", subject.created_object.title
+    assert_equal "Hello", subject.object.title
   end
   
   def test_after_create_hook
@@ -28,7 +28,7 @@ class ObjectCreatorTest < TraverTest
     object = nil
     
     subject.after_create = lambda do |creator|
-      object = creator.created_object
+      object = creator.object
     end
     
     subject.create_object

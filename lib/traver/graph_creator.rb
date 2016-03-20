@@ -14,7 +14,7 @@ module Traver
     
     def create_graph
       object_creator.after_create = lambda do |creator|
-        graph.add_vertex(creator.factory_name, creator.created_object)
+        graph.add_vertex(creator.factory_name, creator.object)
       end
       
       object_creator.create_object

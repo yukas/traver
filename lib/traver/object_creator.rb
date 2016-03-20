@@ -5,7 +5,7 @@ module Traver
     extend Forwardable
     
     attr_reader :factory_name, :params, :settings
-    attr_reader :created_object
+    attr_reader :object
     
     attr_accessor :after_create
     
@@ -21,6 +21,8 @@ module Traver
     end
     
     def create_object
+      obtain_factory
+      merge_params_with_factory_params
       instantiate_object
       set_object_state
       persist_object
@@ -28,13 +30,18 @@ module Traver
     end
     
     private
-    attr_reader :factory, :factory_params, :object_class
-
-    def instantiate_object
+    attr_reader :factory, :merged_params
+    
+    def obtain_factory
       @factory = factory_definer.factory_by_name(factory_name)
-      @factory_params = factory.inherited_params.merge(params)
-      @object_class = Object.const_get(factory.root_factory.name.to_s.camelize)
-      @created_object = object_class.new
+    end
+    
+    def merge_params_with_factory_params
+      @merged_params = factory.inherited_params.merge(params)
+    end
+    
+    def instantiate_object
+      @object = factory.object_class.new
     end
     
     def set_object_state
@@ -50,7 +57,7 @@ module Traver
     end
     
     def attributes_params
-      factory_params.select { |k, v| regular_attribute?(k, v) }
+      merged_params.select { |k, v| regular_attribute?(k, v) }
     end
     
     def regular_attribute?(field_name, field_value)
@@ -58,7 +65,7 @@ module Traver
     end
     
     def set_attribute(attribute, value)
-      created_object.public_send("#{attribute}=", value)
+      object.public_send("#{attribute}=", value)
     end
     
     
@@ -71,11 +78,11 @@ module Traver
     end
     
     def nested_objects_params
-      factory_params.select { |k, v| nested_object?(k, v) }
+      merged_params.select { |k, v| nested_object?(k, v) }
     end
     
     def nested_object?(field_name, field_value)
-      nested_object_resolver.nested_object?(object_class, field_name, field_value)
+      nested_object_resolver.nested_object?(factory.object_class, field_name, field_value)
     end
     
     def set_nested_object(k, v)
@@ -87,7 +94,7 @@ module Traver
       object_creator.after_create = after_create
       object_creator.create_object
       
-      object_creator.created_object
+      object_creator.object
     end
     
     
@@ -100,11 +107,11 @@ module Traver
     end
     
     def nested_collections_params
-      factory_params.select { |k, v| nested_collection?(k, v) }
+      merged_params.select { |k, v| nested_collection?(k, v) }
     end
     
     def nested_collection?(field_name, field_value)
-      nested_collection_resolver.nested_collection?(object_class, field_name, field_value)
+      nested_collection_resolver.nested_collection?(factory.object_class, field_name, field_value)
     end
     
     def set_nested_collection(attribute, collection_params)
@@ -118,7 +125,7 @@ module Traver
     end
     
     def persist_object
-      object_persister.persist_object(created_object)
+      object_persister.persist_object(object)
     end
     
     def call_after_create_hook
