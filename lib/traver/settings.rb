@@ -2,11 +2,13 @@ module Traver
   class Settings
     attr_reader :factory_definer,
                 :object_persister,
+                :attribute_resolver,
                 :nested_object_resolver,
                 :nested_collection_resolver
     
     def initialize
       @factory_definer = FactoryDefiner.new
+      @attribute_resolver = PoroAttributeResolver.new
     end            
     
     def define_factory(factory_name, parent_factory_name, params)
