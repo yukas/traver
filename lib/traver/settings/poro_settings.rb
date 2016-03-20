@@ -5,9 +5,8 @@ module Traver
     def initialize
       super
       
-      @object_persister           = PoroObjectPersister.new
-      @nested_object_resolver     = PoroNestedObjectResolver.new
-      @nested_collection_resolver = PoroNestedCollectionResolver.new
+      @object_persister    = PoroObjectPersister.new
+      @attributes_resolver = PoroAttributesResolver.new
     end
   end
 end

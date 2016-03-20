@@ -11,9 +11,7 @@ module Traver
     
     def_delegators :settings, :factory_definer,
                               :object_persister,
-                              :attribute_resolver,
-                              :nested_object_resolver,
-                              :nested_collection_resolver
+                              :attributes_resolver
     
     def initialize(factory_name, params, settings)
       @factory_name = factory_name
@@ -54,7 +52,7 @@ module Traver
     # Attributes
     
     def set_attributes
-      attribute_resolver.select_attributes_params(merged_params, factory.object_class).each do |name, value|
+      attributes_resolver.select_attributes_params(merged_params, factory.object_class).each do |name, value|
         set_attribute(name, value)
       end
     end
@@ -66,7 +64,7 @@ module Traver
     # Nested Objects
     
     def set_nested_objects
-      nested_object_resolver.select_objects_params(merged_params, factory.object_class).each do |name, value|
+      attributes_resolver.select_objects_params(merged_params, factory.object_class).each do |name, value|
         set_nested_object(name, value)
       end
     end
@@ -87,7 +85,7 @@ module Traver
     # Nested Collections
     
     def set_nested_collections
-      nested_collection_resolver.select_nested_collections_params(merged_params, factory.object_class).each do |name, value|
+      attributes_resolver.select_collections_params(merged_params, factory.object_class).each do |name, value|
         set_nested_collection(name, value)
       end
     end

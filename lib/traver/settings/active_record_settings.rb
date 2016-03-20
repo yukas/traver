@@ -5,9 +5,8 @@ module Traver
     def initialize
       super
       
-      @object_persister           = ActiveRecordObjectPersister.new
-      @nested_object_resolver     = ActiveRecordNestedObjectResolver.new
-      @nested_collection_resolver = ActiveRecordNestedCollectionResolver.new
+      @object_persister    = ActiveRecordObjectPersister.new
+      @attributes_resolver = ActiveRecordAttributesResolver.new
     end
   end
 end

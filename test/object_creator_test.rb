@@ -5,15 +5,6 @@ class ObjectCreatorTest < TraverTest
     @subject ||= ObjectCreator.new(:blog, { title: "Hello" }, PoroSettings.new)
   end
   
-  def setup
-    super
-    
-    @factory_definer = FactoryDefiner.new
-    @object_persister = PoroObjectPersister.new
-    @nested_object_resolver = PoroNestedObjectResolver.new
-    @nested_collection_resolver = PoroNestedCollectionResolver.new
-  end
-  
   def test_create_object
     define_class("Blog", :title)
     
