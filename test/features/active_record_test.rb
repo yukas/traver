@@ -150,20 +150,20 @@ class ActiveRecordTest < TraverTest
     assert_equal [{ title: "Post" }], blog.posts
   end
 
-  # def test_automatically_creates_belongs_to_objects
-  #   define_model("Blog", title: :string) do
-  #     has_many :posts
-  #   end
-  #
-  #   define_model("Post", blog_id: :integer, title: :string) do
-  #     belongs_to :blog
-  #   end
-  #
-  #   post = subject.create(:post)
-  #
-  #   assert_equal true, post.persisted?
-  #   assert_equal true, post.blog.persisted?
-  # end
+  def test_automatically_creates_belongs_to_objects
+    define_model("Blog", title: :string) do
+      has_many :posts
+    end
+
+    define_model("Post", blog_id: :integer, title: :string) do
+      belongs_to :blog
+    end
+
+    post = subject.create(:post)
+
+    assert_equal true, post.persisted?
+    assert_equal true, post.blog.persisted?
+  end
 
   # def test_reuse_parent_object_for_child_belongs_to_associations
   #   define_model("User", name: :string) do
