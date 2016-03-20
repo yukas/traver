@@ -20,6 +20,10 @@ module Traver
       end
     end
     
+    def root_name
+      root_factory.name
+    end
+    
     def object_class_name
       root_factory.name.to_s.camelize
     end

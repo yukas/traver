@@ -165,25 +165,25 @@ class ActiveRecordTest < TraverTest
     assert_equal true, post.blog.persisted?
   end
 
-  # def test_reuse_parent_object_for_child_belongs_to_associations
-  #   define_model("User", name: :string) do
-  #     has_many :emails
-  #   end
-  #
-  #   define_model("Email", user_id: :integer, address: :string) do
-  #     belongs_to :user
-  #   end
-  #
-  #   subject.define_factory :user, {
-  #     emails: [{ }]
-  #   }
-  #
-  #   subject.define_factory :email, {
-  #     address: "walter@white.com"
-  #   }
-  #
-  #   user = subject.create(:user)
-  #
-  #   assert_equal user.emails.first.user, user
-  # end
+  def test_reuse_parent_object_for_child_belongs_to_associations
+    define_model("User", name: :string) do
+      has_many :emails
+    end
+
+    define_model("Email", user_id: :integer, address: :string) do
+      belongs_to :user
+    end
+
+    subject.define_factory :user, {
+      emails: [{ }]
+    }
+
+    subject.define_factory :email, {
+      address: "walter@white.com"
+    }
+
+    user = subject.create(:user)
+
+    assert_equal user.emails.first.user, user
+  end
 end

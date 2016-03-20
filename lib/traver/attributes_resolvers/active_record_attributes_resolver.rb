@@ -9,14 +9,23 @@ module Traver
       belongs_to_params.merge(objects_params)
     end
     
+    def select_collections_params(object, factory, params)
+      collections_params = params.select { |name, value| nested_collection?(factory.object_class, name, value) }
+      
+      res = collections_params.each do |name, value|
+        value.each do |hash|
+          hash.merge!(factory.name => object)
+        end
+      end
+      
+      res
+    end
+    
     private
     
-    def get_belongs_to_params(object_class)
-      associations = object_class.reflect_on_all_associations(:belongs_to)
-      
-      associations.each_with_object({}) do |association, result|
-        result[association.name] = {}
-      end
+    def nested_object?(object_class, name, value)
+      reflection = object_class.reflect_on_association(name)
+      reflection && !reflection.collection?
     end
     
     def nested_collection?(object_class, name, value)
@@ -26,10 +35,11 @@ module Traver
       end
     end
     
-    def nested_object?(object_class, name, value)
-      if value.is_a?(Hash)
-        reflection = object_class.reflect_on_association(name)
-        reflection && !reflection.collection?
+    def get_belongs_to_params(object_class)
+      associations = object_class.reflect_on_all_associations(:belongs_to)
+      
+      associations.each_with_object({}) do |association, result|
+        result[association.name] = {}
       end
     end
   end

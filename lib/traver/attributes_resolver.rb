@@ -8,8 +8,8 @@ module Traver
       params.select { |name, value| nested_object?(object_class, name, value) }
     end
     
-    def select_collections_params(params, object_class)
-      params.select { |name, value| nested_collection?(object_class, name, value) }
+    def select_collections_params(object, factory, params)
+      params.select { |name, value| nested_collection?(factory.object_class, name, value) }
     end
     
     private
