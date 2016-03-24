@@ -67,22 +67,15 @@ blog = Traver.create(blog: {
 
 blog.posts #=> [#<Post @title="Post #1">, #<Post @title="Post #2">]
 
-# More concise syntax
-blog = Traver.create(blog: {
-  title: "Hello",
-  posts: [2, title: "Post #${n}"]
-})
+```
 
-blog.posts #=> [#<Post @title="Post #1">, #<Post @title="Post #2">]
+Different ways to create collections:
 
-# Having defined factory
-Traver.factory(post: { title: "Post #${n}"})
-
-# Even more concise
-blog = Traver.create(blog: { title: "Hello", posts: 2 })
-
-blog.posts #=> [#<Post @title="Post #1">, #<Post @title="Post #2">]
-
+```ruby
+Traver.create(blog: { title: "Hello", posts: 2 })
+Traver.create(blog: { title: "Hello", posts: [2, title: "Post #${n}"] })
+Traver.create(blog: { title: "Hello", posts: [2, :published_post] })
+Traver.create(blog: { title: "Hello", posts: [:published_post, :draft_post] })
 ```
 
 Any level of nesting:
@@ -119,6 +112,15 @@ graph.tag1  #=> #<Tag>
 graph.tag2  #=> #<Tag>
 
 blog, post = Traver.create_graph(blog: { posts: 1 })[:blog, :post]
+```
+
+Ability to reference already created objects:
+
+```ruby
+blog = Traver.create(blog: {
+  post: { tags: 1 }
+  tags: [-> (graph) { graph.tag1 }]
+})
 ```
 
 ## Rails
