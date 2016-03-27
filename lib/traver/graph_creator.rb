@@ -8,7 +8,7 @@ module Traver
       @params = params
       @settings = settings
       
-      @object_creator = ObjectCreator.new(factory_name, params, settings)
+      @object_creator = ObjectCreator.new(factory_name, params, settings, {})
       @graph = Graph.new
     end
     

@@ -15,7 +15,7 @@ module Traver
     def create(options)
       factory_name, params = parse_create_options(options)
       
-      object_creator = ObjectCreator.new(factory_name, params, settings)
+      object_creator = ObjectCreator.new(factory_name, params, settings, {})
       object_creator.create_object
     
       object_creator.object

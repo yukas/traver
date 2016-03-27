@@ -4,7 +4,7 @@ module Traver
   class ObjectCreator
     extend Forwardable
     
-    attr_reader :factory_name, :params, :settings
+    attr_reader :factory_name, :params, :settings, :cache
     attr_reader :object
     
     attr_accessor :after_create
@@ -13,26 +13,40 @@ module Traver
                               :object_persister,
                               :attributes_resolver
     
-    def initialize(factory_name, params, settings)
+    def initialize(factory_name, params, settings, cache)
       @factory_name = factory_name
       @params       = params
       @settings     = settings
+      @cache        = cache
     end
     
     def create_object
       obtain_factory
-      merge_params_with_factory_params
-      merge_default_params
-      instantiate_object
-      set_attributes
-      set_nested_objects
-      persist_object
-      set_nested_collections
-      call_after_create_hook
+      
+      if get_object_from_cache?
+        get_object_from_cache
+      else
+        merge_params_with_factory_params
+        merge_default_params
+        instantiate_object
+        set_attributes
+        set_nested_objects
+        persist_object
+        set_nested_collections
+        call_after_create_hook
+      end
     end
     
     private
     attr_reader :factory
+    
+    def get_object_from_cache?
+      params == {} && cache.has_key?(factory.root_name)
+    end
+    
+    def get_object_from_cache
+      @object = cache[factory.root_name]
+    end
     
     def obtain_factory
       @factory = factory_definer.factory_by_name(factory_name)
@@ -87,7 +101,7 @@ module Traver
     end
     
     def create_nested_object(factory_name, params)
-      object_creator = ObjectCreator.new(factory_name, params, settings)
+      object_creator = ObjectCreator.new(factory_name, params, settings, cache)
       object_creator.after_create = after_create
       object_creator.create_object
       
@@ -114,10 +128,16 @@ module Traver
     end
     
     
+    # Persist Object
     
     def persist_object
       object_persister.persist_object(object)
+      
+      cache[factory.root_name] = object
     end
+    
+    
+    # Hooks
     
     def call_after_create_hook
       after_create.call(self) if after_create
