@@ -7,21 +7,13 @@ module Traver
     end
     
     def define_factory(factory_name, *options)
-      parent_factory_name = nil
-    
-      if options.size == 1
-        params = options.first
-      elsif options.size == 2
-        parent_factory_name, params = options
-      end
+      parent_factory_name, params = parse_factory_options(options)
     
       settings.define_factory(factory_name, parent_factory_name, params)
     end
     
     def create(options)
-      options = { options => {} } if options.is_a?(Symbol)
-      
-      factory_name, params = *options.first
+      factory_name, params = parse_create_options(options)
       
       object_creator = ObjectCreator.new(factory_name, params, settings)
       object_creator.create_object
@@ -30,9 +22,7 @@ module Traver
     end
     
     def create_graph(options)
-      options = { options => {} } if options.is_a?(Symbol)
-      
-      factory_name, params = *options.first
+      factory_name, params = parse_create_options(options)
     
       graph_creator = GraphCreator.new(factory_name, params, settings)
       graph_creator.create_graph
@@ -42,6 +32,26 @@ module Traver
     
     def undefine_all_factories
       settings.undefine_all_factories
+    end
+    
+    private
+    
+    def parse_factory_options(options)
+      parent_factory_name = nil
+    
+      if options.size == 1
+        params = options.first
+      elsif options.size == 2
+        parent_factory_name, params = options
+      end
+      
+      [parent_factory_name, params]
+    end
+    
+    def parse_create_options(options)
+      options = { options => {} } if options.is_a?(Symbol)
+      
+      options.first
     end
   end
 end
