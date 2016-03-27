@@ -22,6 +22,7 @@ module Traver
     def create_object
       obtain_factory
       merge_params_with_factory_params
+      merge_default_params
       instantiate_object
       set_attributes
       set_nested_objects
@@ -31,14 +32,26 @@ module Traver
     end
     
     private
-    attr_reader :factory, :merged_params
+    attr_reader :factory
     
     def obtain_factory
       @factory = factory_definer.factory_by_name(factory_name)
     end
     
     def merge_params_with_factory_params
-      @merged_params = factory.inherited_params.merge(params)
+      @params = factory.inherited_params.merge(params)
+    end
+    
+    def merge_default_params
+      @params = default_params.merge(params)
+    end
+    
+    def default_params
+      associations = factory.object_class.reflect_on_all_associations(:belongs_to)
+      
+      associations.each_with_object({}) do |association, result|
+        result[association.name] = {}
+      end
     end
     
     def instantiate_object
@@ -48,7 +61,7 @@ module Traver
     # Attributes
     
     def set_attributes
-      attributes_resolver.select_attributes_params(merged_params, factory.object_class).each do |name, value|
+      attributes_resolver.select_attributes_params(params, factory.object_class).each do |name, value|
         set_attribute(name, value)
       end
     end
@@ -60,7 +73,7 @@ module Traver
     # Nested Objects
     
     def set_nested_objects
-      attributes_resolver.select_objects_params(merged_params, factory.object_class).each do |name, value|
+      attributes_resolver.select_objects_params(params, factory.object_class).each do |name, value|
         set_nested_object(name, value)
       end
     end
@@ -85,7 +98,7 @@ module Traver
     # Nested Collections
     
     def set_nested_collections
-      attributes_resolver.select_collections_params(object, factory, merged_params).each do |name, value|
+      attributes_resolver.select_collections_params(object, factory, params).each do |name, value|
         set_nested_collection(name, value)
       end
     end

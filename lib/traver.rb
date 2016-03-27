@@ -43,7 +43,7 @@ module Traver
     
     def settings
       if defined?(Rails)
-        RailsSettings.new
+        ActiveRecordSettings.new
       else
         PoroSettings.new
       end
