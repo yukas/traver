@@ -19,15 +19,21 @@ module Traver
   class Error < Exception; end
   
   class << self
+    attr_reader :factories_loaded
+    
     def define_factory(factory_name, *options)
       traver_constructor.define_factory(factory_name, *options)
     end
   
     def create(options)
+      load_factories
+      
       traver_constructor.create(options)
     end
   
     def create_graph(options)
+      load_factories
+      
       traver_constructor.create_graph(options)
     end
     
@@ -46,6 +52,14 @@ module Traver
         ActiveRecordSettings.new
       else
         PoroSettings.new
+      end
+    end
+    
+    def load_factories
+      unless factories_loaded
+        factories_loader.load_factories
+
+        @factories_loader = true
       end
     end
     
