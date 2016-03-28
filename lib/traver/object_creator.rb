@@ -81,6 +81,8 @@ module Traver
     end
     
     def set_attribute(attribute, value)
+      value = value.call if value.is_a?(Proc)
+
       object.public_send("#{attribute}=", value)
     end
     
@@ -132,7 +134,6 @@ module Traver
     
     def persist_object
       object_persister.persist_object(object)
-      
       cache[factory.root_name] = object
     end
     
