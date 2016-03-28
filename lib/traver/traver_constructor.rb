@@ -30,6 +30,15 @@ module Traver
       graph_creator.graph
     end
     
+    def create_list(num, options)
+      factory_name, params = parse_create_options(options)
+      
+      list_creator = ListCreator.new(num, factory_name, params, settings)
+      list_creator.create_list
+      
+      list_creator.list
+    end
+    
     def undefine_all_factories
       settings.undefine_all_factories
     end

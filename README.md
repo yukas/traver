@@ -92,11 +92,14 @@ blog = Traver.create(blog: {
 blog.posts.first.tag.first #=> #<Tag @name="Happy">
 ```
 
-Create lists:
+Lists with sequences:
 
 ```ruby
-users = Traver.create_list(:user, 2, email: "user${n}@mail.me")
+users = Traver.create_list(2, user: { email: "user${n}@mail.me" })
 #=> [#<User @email="user1@mail.me">, #<User @email="user2@mail.me">]
+
+users = Traver.create_list(2, :published_post)
+#=> [#<Post @published=true>, #<User @published=true>]
 ```
 
 Graph is a convenient way to reference created objects:

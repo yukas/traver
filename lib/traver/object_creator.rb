@@ -14,6 +14,13 @@ module Traver
                               :attributes_resolver,
                               :default_params_creator
     
+    def self.create_object(factory_name, params, settings, cache = {})
+      creator = new(factory_name, params, settings, cache)
+      creator.create_object
+      
+      creator.object
+    end
+    
     def initialize(factory_name, params, settings, cache = {})
       @factory_name = factory_name
       @params       = params

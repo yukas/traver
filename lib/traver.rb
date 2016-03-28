@@ -24,6 +24,12 @@ module Traver
       traver_constructor.create_graph(options)
     end
     
+    def create_list(num, options)
+      load_factories
+      
+      traver_constructor.create_list(num, options)
+    end
+    
     def undefine_all_factories
       traver_constructor.undefine_all_factories
     end
