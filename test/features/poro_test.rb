@@ -55,20 +55,70 @@ class PoroTest < TraverTest
   end
  
   def test_create_associated_collection
-    define_class("Blog", :title, :posts)
+    define_class("Blog", :posts)
     define_class("Post", :title)
   
     blog = subject.create(blog: {
-      title: "Hello",
       posts: [
         { title: "Post #1" },
         { title: "Post #2" }
       ]
     })
   
-    assert_equal "Hello",   blog.title
     assert_equal "Post #1", blog.posts.first.title
     assert_equal "Post #2", blog.posts.last.title
+  end
+  
+  def test_create_collection_using_number
+    define_class("Blog", :posts)
+    define_class("Post", :title)
+  
+    blog = subject.create(blog: {
+      posts: [ 2 ]
+    })
+  
+    assert_equal 2, blog.posts.length
+  end
+
+  def test_create_collection_using_number_and_params
+    define_class("Blog", :posts)
+    define_class("Post", :title)
+  
+    blog = subject.create(blog: {
+      posts: [ 2, title: "Post" ]
+    })
+  
+    assert_equal "Post",  blog.posts.first.title
+    assert_equal "Post",  blog.posts.last.title
+  end
+
+  def test_create_collection_using_number_and_factory_name
+    define_class("Blog", :posts)
+    define_class("Post", :published)
+    
+    subject.define_factory(:published_post, :post, { published: true })
+  
+    blog = subject.create(blog: {
+      posts: [ 2, :published_post ]
+    })
+  
+    assert_equal true,  blog.posts.first.published
+    assert_equal true,  blog.posts.last.published
+  end
+
+  def test_create_collection_using_factory_names
+    define_class("Blog", :posts)
+    define_class("Post", :published)
+    
+    subject.define_factory(:published_post, :post, { published: true })
+    subject.define_factory(:draft_post,     :post, { published: false })
+  
+    blog = subject.create(blog: {
+      posts: [ :published_post, :draft_post ]
+    })
+    
+    assert_equal true,  blog.posts.first.published
+    assert_equal false, blog.posts.last.published
   end
 
   def test_create_graph

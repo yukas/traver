@@ -90,6 +90,22 @@ class ActiveRecordTest < TraverTest
     assert_equal true, blog.posts.last.persisted?
   end
 
+  def test_create_collection_using_number
+    define_model("Blog") do
+      has_many :posts
+    end
+
+    define_model("Post", blog_id: :integer) do
+      belongs_to :blog
+    end
+  
+    blog = subject.create(blog: {
+      posts: 2
+    })
+  
+    assert_equal 2, blog.posts.length
+  end
+  
   def test_any_level_of_nesting
     define_model("Blog", title: :string) do
       has_many :posts

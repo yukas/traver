@@ -4,7 +4,7 @@ module Traver
       associations = object_class.reflect_on_all_associations(:belongs_to)
       
       associations.each_with_object({}) do |association, result|
-        result[association.name] = {}
+        result[association.name] = :__ref__
       end
     end
   end

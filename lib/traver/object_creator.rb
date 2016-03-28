@@ -34,6 +34,7 @@ module Traver
       if obtain_object_from_cache?
         obtain_object_from_cache
       else
+        change_ref_to_be_empty_hash
         merge_params_with_factory_params
         merge_default_params
         instantiate_object
@@ -48,16 +49,20 @@ module Traver
     private
     attr_reader :factory
     
+    def obtain_factory
+      @factory = factory_definer.factory_by_name(factory_name)
+    end
+    
     def obtain_object_from_cache?
-      params == {} && cache.has_key?(factory.root_name)
+      params == :__ref__ && cache.has_key?(factory.root_name)
     end
     
     def obtain_object_from_cache
       @object = cache[factory.root_name]
     end
     
-    def obtain_factory
-      @factory = factory_definer.factory_by_name(factory_name)
+    def change_ref_to_be_empty_hash
+      @params = {} if params == :__ref__
     end
     
     def merge_params_with_factory_params
@@ -82,7 +87,7 @@ module Traver
     
     def set_attribute(attribute, value)
       value = value.call if value.is_a?(Proc)
-
+      
       object.public_send("#{attribute}=", value)
     end
     
@@ -95,7 +100,7 @@ module Traver
     end
     
     def set_nested_object(name, value)
-      if value.is_a?(Hash)
+      if value.is_a?(Hash) || value == :__ref__
         set_attribute(name, create_nested_object(name, value))
       else
         set_attribute(name, value)
@@ -114,18 +119,48 @@ module Traver
     # Nested Collections
     
     def set_nested_collections
-      attributes_resolver.select_collections_params(object, factory, params).each do |name, value|
-        set_nested_collection(name, value)
+      attributes_resolver.select_collections_params(object, factory, params).each do |collection_name, params_array|
+        set_nested_collection(collection_name, params_array)
       end
     end
     
-    def set_nested_collection(name, value)
-      set_attribute(name, create_nested_collection(name, value))
+    def set_nested_collection(collection_name, params_array)
+      factory_name = collection_name.to_s.singularize.to_sym
+      
+      set_attribute(collection_name, create_nested_collection(factory_name, params_array))
     end
     
-    def create_nested_collection(factory_name, collection_params)
-      collection_params.map do |params|
-        create_nested_object(factory_name.to_s.singularize.to_sym, params)
+    def create_nested_collection(factory_name, params_array)
+      if params_array.is_a?(Integer)
+        params_array = [{}] * params_array
+        
+        params_array.map do |params|
+          create_nested_object(factory_name, params)
+        end
+      elsif params_array.first.is_a?(Symbol)
+        params_array.map do |factory_name|
+          create_nested_object(factory_name, {})
+        end
+      else
+        if params_array.first.is_a?(Integer)
+          num, hash_or_symbol = params_array
+        
+          if hash_or_symbol.nil?
+            params_array = [{}] * num
+          elsif (hash = hash_or_symbol).is_a?(Hash)
+            params_array = [hash] * num
+          elsif hash_or_symbol.is_a?(Symbol)
+            factory_name = hash_or_symbol
+          
+            params_array = [{}] * num
+          else
+            raise "Wrong collection params #{params_array}"
+          end
+        end
+      
+        params_array.map do |params|
+          create_nested_object(factory_name, params)
+        end
       end
     end
     

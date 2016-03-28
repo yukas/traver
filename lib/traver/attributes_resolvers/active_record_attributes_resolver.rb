@@ -9,10 +9,8 @@ module Traver
     end
     
     def nested_collection?(object_class, name, value)
-      if value.is_a?(Array)
-        reflection = object_class.reflect_on_association(name)
-        reflection && reflection.collection?
-      end
+      reflection = object_class.reflect_on_association(name)
+      reflection && reflection.collection?
     end
   end
 end
