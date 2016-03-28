@@ -11,9 +11,10 @@ module Traver
     
     def_delegators :settings, :factory_definer,
                               :object_persister,
-                              :attributes_resolver
+                              :attributes_resolver,
+                              :default_params_creator
     
-    def initialize(factory_name, params, settings, cache)
+    def initialize(factory_name, params, settings, cache = {})
       @factory_name = factory_name
       @params       = params
       @settings     = settings
@@ -23,8 +24,8 @@ module Traver
     def create_object
       obtain_factory
       
-      if get_object_from_cache?
-        get_object_from_cache
+      if obtain_object_from_cache?
+        obtain_object_from_cache
       else
         merge_params_with_factory_params
         merge_default_params
@@ -40,11 +41,11 @@ module Traver
     private
     attr_reader :factory
     
-    def get_object_from_cache?
+    def obtain_object_from_cache?
       params == {} && cache.has_key?(factory.root_name)
     end
     
-    def get_object_from_cache
+    def obtain_object_from_cache
       @object = cache[factory.root_name]
     end
     
@@ -57,15 +58,7 @@ module Traver
     end
     
     def merge_default_params
-      @params = default_params.merge(params)
-    end
-    
-    def default_params
-      associations = factory.object_class.reflect_on_all_associations(:belongs_to)
-      
-      associations.each_with_object({}) do |association, result|
-        result[association.name] = {}
-      end
+      @params = default_params_creator.default_params(factory.object_class).merge(params)
     end
     
     def instantiate_object

@@ -2,7 +2,8 @@ module Traver
   class Settings
     attr_reader :factory_definer,
                 :object_persister,
-                :attributes_resolver
+                :attributes_resolver,
+                :default_params_creator
     
     def initialize
       @factory_definer = FactoryDefiner.new

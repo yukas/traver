@@ -1,19 +1,6 @@
 require "active_support/inflector"
-require "traver/version"
-require "traver/factory_definer"
-require "traver/factory"
-require "traver/object_creator"
-require "traver/graph"
-require "traver/graph_creator"
-require "traver/object_persisters/active_record_object_persister"
-require "traver/object_persisters/poro_object_persister"
-require "traver/factories_loader"
-require "traver/attributes_resolver"
-require "traver/attributes_resolvers/poro_attributes_resolver"
-require "traver/attributes_resolvers/active_record_attributes_resolver"
-require "traver/traver_constructor"
-require "traver/settings/poro_settings"
-require "traver/settings/active_record_settings"
+
+Dir["#{File.dirname(__FILE__)}/traver/**/*.rb"].each { |file| require file }
 
 module Traver
   class Error < Exception; end
