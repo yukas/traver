@@ -3,10 +3,12 @@ module Traver
     attr_reader :factory_definer,
                 :object_persister,
                 :attributes_resolver,
-                :default_params_creator
+                :default_params_creator,
+                :sequencer
     
     def initialize
       @factory_definer = FactoryDefiner.new
+      @sequencer       = Sequencer.new
     end            
     
     def define_factory(factory_name, parent_factory_name, params)

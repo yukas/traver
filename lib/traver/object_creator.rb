@@ -12,7 +12,8 @@ module Traver
     def_delegators :settings, :factory_definer,
                               :object_persister,
                               :attributes_resolver,
-                              :default_params_creator
+                              :default_params_creator,
+                              :sequencer
     
     def self.create_object(factory_name, params, settings, cache = {})
       creator = new(factory_name, params, settings, cache)
@@ -86,7 +87,13 @@ module Traver
     end
     
     def set_attribute(attribute, value)
-      value = value.call if value.is_a?(Proc)
+      if value.is_a?(Proc)
+        value = value.call
+      elsif value.is_a?(String)
+        if sequencer.value_has_sequence?(value)
+          value = sequencer.interpolate_sequence(attribute, value)
+        end
+      end
       
       object.public_send("#{attribute}=", value)
     end

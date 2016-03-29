@@ -1,8 +1,10 @@
 require "test_helper"
 
 class PoroTest < TraverTest  
-  def subject
-    @subject ||= TraverConstructor.new(PoroSettings.new)
+  attr_reader :subject
+  
+  def setup
+    @subject = TraverConstructor.new(PoroSettings.new)
   end
   
   def test_create_object
@@ -190,5 +192,46 @@ class PoroTest < TraverTest
     assert_equal 2, users.length
     assert_equal "Walter", users.first.name
     assert_equal "Walter", users.last.name
+  end
+  
+  def test_sequence
+    define_class("Blog", :posts)
+    define_class("Post", :title)
+
+    subject.define_factory(:post, {
+      title: "Post ${n}"
+    })
+
+    blog = subject.create(blog: {
+      posts: 2
+    })
+
+    assert_equal "Post 1", blog.posts.first.title
+    assert_equal "Post 2", blog.posts.last.title
+  end
+  
+  def test_sequences_for_different_attributes_are_different
+    define_class("Blog", :posts, :tags)
+    define_class("Post", :title)
+    define_class("Tag", :name)
+
+    subject.define_factory(:post, {
+      title: "Post ${n}"
+    })
+
+    subject.define_factory(:tag, {
+      name: "Tag ${n}"
+    })
+
+    blog = subject.create(blog: {
+      posts: 2,
+      tags: 2
+    })
+
+    assert_equal "Post 1", blog.posts.first.title
+    assert_equal "Post 2", blog.posts.last.title
+    
+    assert_equal "Tag 1", blog.tags.first.name
+    assert_equal "Tag 2", blog.tags.last.name
   end
 end
