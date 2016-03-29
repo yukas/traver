@@ -100,7 +100,9 @@ module Traver
     end
     
     def set_nested_object(name, value)
-      if value.is_a?(Hash) || value == :__ref__
+      if value.is_a?(Integer)
+        set_attribute(name, create_nested_object(name, {}))
+      elsif value.is_a?(Hash) || value == :__ref__
         set_attribute(name, create_nested_object(name, value))
       else
         set_attribute(name, value)

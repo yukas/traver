@@ -4,15 +4,17 @@ module Traver
     private
     
     def nested_object?(object_class, name, value)
-      if value.is_a?(Hash)
-        Object.const_defined?(name.to_s.camelize)
-      end
+      Object.const_defined?(name.to_s.camelize)
     end
 
     def nested_collection?(object_class, name, value)
-      if value.is_a?(Array)
+      if plural?(name)
         Object.const_defined?(name.to_s.singularize.camelize)
       end
+    end
+    
+    def plural?(val)
+      val.to_s.pluralize == val.to_s
     end
   end
 end

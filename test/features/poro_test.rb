@@ -54,6 +54,17 @@ class PoroTest < TraverTest
     assert_equal "Mike",  blog.user.name
   end
  
+  def test_create_associated_object_using_number
+    define_class("Blog", :user)
+    define_class("User")
+
+    blog = subject.create(blog: {
+      user: 1
+    })
+    
+    assert_instance_of User, blog.user
+  end
+ 
   def test_create_associated_collection
     define_class("Blog", :posts)
     define_class("Post", :title)
@@ -69,18 +80,20 @@ class PoroTest < TraverTest
     assert_equal "Post #2", blog.posts.last.title
   end
   
-  def test_create_collection_using_number
+  def test_create_collection_with_a_number
     define_class("Blog", :posts)
     define_class("Post", :title)
   
     blog = subject.create(blog: {
-      posts: [ 2 ]
+      posts: 2
     })
   
     assert_equal 2, blog.posts.length
+    assert_instance_of Post, blog.posts.first
+    assert_instance_of Post, blog.posts.last
   end
 
-  def test_create_collection_using_number_and_params
+  def test_create_collection_with_number_and_params
     define_class("Blog", :posts)
     define_class("Post", :title)
   
