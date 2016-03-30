@@ -111,6 +111,8 @@ module Traver
         set_attribute(name, create_nested_object(name, {}))
       elsif value.is_a?(Hash) || value == :__ref__
         set_attribute(name, create_nested_object(name, value))
+      elsif value.is_a?(Symbol)
+        set_attribute(name, create_nested_object(value, {}))
       else
         set_attribute(name, value)
       end

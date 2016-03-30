@@ -18,7 +18,7 @@ and run `bundle install` from your shell.
 
 ## Usage
 
-Create an object with attributes:
+Create object with attributes:
 
 ```ruby
 blog = Traver.create(blog: { title: "Blog" }) #=> #<Blog @title="Blog">
@@ -39,7 +39,7 @@ Traver.create(:user) #=> #<User @full_name="Walter White">
 Traver.create(:post) #=> #<Post @title="Hello">
 ```
 
-Create child factories:
+Define child factories:
 
 ```ruby
 Traver.define_factory(:published_post, :post, {
@@ -54,21 +54,7 @@ Traver.create(:published_post) #=> #<Post @title="Hello", @published=true>
 Traver.create(:draft_post)     #=> #<Post @title="Hello", @published=false>
 ```
 
-Use defined factories to define more complex factorie:
-
-```ruby
-Traver.define_factory(:blog, {
-  title: "My Blog"
-})
-
-Traver.define_factory(:blog_with_posts, :blog, {
-  posts: [:published_post, :draft_post]
-})
-
-Traver.create(user: { blog: :blog_with_a_post }) #=> #<Post @title="Hello", @published=false>
-```
-
-Create associated object:
+Create associated objects:
 
 ```ruby
 blog = Traver.create(blog: {
@@ -79,7 +65,21 @@ blog = Traver.create(blog: {
 blog.user #=> #<User @name="Mike">
 ```
 
-Create object collections:
+Create associated objects using factory names:
+
+```ruby
+Traver.define_factory(:mike, :user, {
+  name: "Mike"
+})
+
+blog = Traver.create(blog: {
+  title: "Hello",
+  user: :mike
+})
+
+```
+
+Create associated collections:
 
 ```ruby
 blog = Traver.create(blog: {
@@ -94,30 +94,21 @@ blog.posts #=> [#<Post @title="Post #1">, #<Post @title="Post #2">]
 
 ```
 
-Different ways to create collections:
+Create associated collections using numbers:
 
 ```ruby
 Traver.create(blog: { title: "Hello", posts: 2 })
 Traver.create(blog: { title: "Hello", posts: [2, title: "Post #${n}"] })
 Traver.create(blog: { title: "Hello", posts: [2, :published_post] })
+```
+
+Create associated collections using factory names:
+
+```ruby
 Traver.create(blog: { title: "Hello", posts: [:published_post, :draft_post] })
 ```
 
-Any level of nesting:
-
-```ruby
-blog = Traver.create(blog: {
-  title: "Blog",
-  posts: [{
-    title: "Hello",
-    tags: [{ name: "Happy" }]
-  }]
-})
-
-blog.posts.first.tag.first #=> #<Tag @name="Happy">
-```
-
-Lists with sequences:
+Create lists with sequences:
 
 ```ruby
 users = Traver.create_list(2, user: { email: "user${n}@mail.me" })
@@ -142,7 +133,7 @@ graph.tag2  #=> #<Tag>
 blog, post = Traver.create_graph(blog: { posts: 1 })[:blog, :post]
 ```
 
-Ability to reference already created objects:
+Reference already created objects:
 
 ```ruby
 blog = Traver.create(blog: {
@@ -152,6 +143,7 @@ blog = Traver.create(blog: {
 ```
 
 ## Rails
+
 By default Traver loads factories from`test/factories.rb` or `spec/factories.rb` for rspec users.
 
 Objects for `belongs_to` associations are created automatically:

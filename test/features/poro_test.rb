@@ -66,7 +66,22 @@ class PoroTest < TraverTest
     
     assert_instance_of User, blog.user
   end
- 
+  
+  def test_create_associated_object_using_factory_name
+    define_class("User", :blog)
+    define_class("Blog", :title)
+    
+    subject.define_factory(:funky_blog, :blog, {
+      title: "Funky title"
+    })
+    
+    user = subject.create(user: {
+      blog: :funky_blog
+    })
+    
+    assert_equal "Funky title", user.blog.title 
+  end
+  
   def test_create_associated_collection
     define_class("Blog", :posts)
     define_class("Post", :title)
