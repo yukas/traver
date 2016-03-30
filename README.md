@@ -27,20 +27,45 @@ blog = Traver.create(blog: { title: "Blog" }) #=> #<Blog @title="Blog">
 Define and use factories:
 
 ```ruby
-Traver.factory(:post, {
+Traver.define_factory(:user, {
+  full_name: "Walter White"
+})
+
+Traver.define_factory(:post, {
   title: "Hello"
 })
 
-Traver.factory(:published_post, :post, {
+Traver.create(:user) #=> #<User @full_name="Walter White">
+Traver.create(:post) #=> #<Post @title="Hello">
+```
+
+Create child factories:
+
+```ruby
+Traver.define_factory(:published_post, :post, {
   published: true
 })
 
-Traver.factory(:draft_post, :post, {
+Traver.define_factory(:draft_post, :post, {
   published: false
 })
 
 Traver.create(:published_post) #=> #<Post @title="Hello", @published=true>
 Traver.create(:draft_post)     #=> #<Post @title="Hello", @published=false>
+```
+
+Use defined factories to define more complex factorie:
+
+```ruby
+Traver.define_factory(:blog, {
+  title: "My Blog"
+})
+
+Traver.define_factory(:blog_with_posts, :blog, {
+  posts: [:published_post, :draft_post]
+})
+
+Traver.create(user: { blog: :blog_with_a_post }) #=> #<Post @title="Hello", @published=false>
 ```
 
 Create associated object:
