@@ -8,28 +8,28 @@ module Traver
   class << self
     attr_reader :factories_loaded
     
+    def create(*options)
+      load_factories
+      
+      traver_constructor.create(*options)
+    end
+  
+    def create_graph(*options)
+      load_factories
+      
+      traver_constructor.create_graph(*options)
+    end
+    
+    def create_list(num, *options)
+      load_factories
+      
+      traver_constructor.create_list(num, *options)
+    end
+    
     def define_factory(factory_name, *options)
       traver_constructor.define_factory(factory_name, *options)
     end
   
-    def create(options)
-      load_factories
-      
-      traver_constructor.create(options)
-    end
-  
-    def create_graph(options)
-      load_factories
-      
-      traver_constructor.create_graph(options)
-    end
-    
-    def create_list(num, options)
-      load_factories
-      
-      traver_constructor.create_list(num, options)
-    end
-    
     def undefine_all_factories
       traver_constructor.undefine_all_factories
     end
@@ -52,7 +52,7 @@ module Traver
       unless factories_loaded
         factories_loader.load_factories
 
-        @factories_loader = true
+        @factories_loaded = true
       end
     end
     
