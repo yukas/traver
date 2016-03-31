@@ -175,7 +175,7 @@ class PoroTest < TraverTest
     assert_equal "Tag", graph.tags.first.name
   end
 
-  def test_assign_hash_if_no_constant_defined
+  def test_assign_hash_instead_of_creating_association_object_if_no_constant_defined
     define_class("Blog", :title, :user)
   
     blog = subject.create(blog: {
@@ -186,7 +186,7 @@ class PoroTest < TraverTest
     assert_equal Hash[{ name: "Mike" }], blog.user
   end
 
-  def test_assign_array_if_no_constant_defined
+  def test_assign_array_instead_of_creating_collection_objects_if_no_constant_defined
     define_class("Blog", :title, :posts)
   
     blog = subject.create(blog: {
@@ -248,5 +248,30 @@ class PoroTest < TraverTest
     
     assert_equal "Tag 1", blog.tags.first.name
     assert_equal "Tag 2", blog.tags.last.name
+  end
+  
+  def test_accept_proc_as_a_value_for_attribute
+    define_class("Post", :published_at)
+    time = DateTime.now
+    
+    DateTime.stub(:now, time) do
+      post = subject.create(post: {
+        published_at: -> { DateTime.now }
+      })
+    
+      assert_equal time, post.published_at
+    end
+  end
+  
+  def test_evaluate_proc_in_context_of_created_object
+    define_class("User", :first_name, :last_name, :full_name)
+    
+    user = subject.create(user: {
+      first_name: "Walter",
+      last_name: "White",
+      full_name: -> { "#{first_name} #{last_name}" }
+    })
+    
+    assert_equal "Walter White", user.full_name
   end
 end

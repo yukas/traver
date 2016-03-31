@@ -4,7 +4,7 @@ module Traver
   class ObjectCreator
     extend Forwardable
     
-    attr_reader :factory_name, :params, :settings, :cache
+    attr_reader :factory_name, :params, :settings, :cache, :nesting
     attr_reader :object
     
     attr_accessor :after_create
@@ -22,11 +22,12 @@ module Traver
       creator.object
     end
     
-    def initialize(factory_name, params, settings, cache = {})
+    def initialize(factory_name, params, settings, cache = {}, nesting = 1)
       @factory_name = factory_name
       @params       = params
       @settings     = settings
       @cache        = cache
+      @nesting      = nesting
     end
     
     def create_object
@@ -35,8 +36,10 @@ module Traver
       if obtain_object_from_cache?
         obtain_object_from_cache
       else
+        # puts "#{'-' * nesting} #{factory_name}<br/>"
+        
         change_ref_to_be_empty_hash
-        merge_params_with_factory_params
+        merge_factory_params
         merge_default_params
         instantiate_object
         set_attributes
@@ -66,7 +69,7 @@ module Traver
       @params = {} if params == :__ref__
     end
     
-    def merge_params_with_factory_params
+    def merge_factory_params
       @params = factory.inherited_params.merge(params)
     end
     
@@ -88,7 +91,7 @@ module Traver
     
     def set_attribute(attribute, value)
       if value.is_a?(Proc)
-        value = value.call
+        value = object.instance_exec(&value)
       elsif value.is_a?(String)
         if sequencer.value_has_sequence?(value)
           value = sequencer.interpolate_sequence(attribute, value)
@@ -102,6 +105,7 @@ module Traver
     
     def set_nested_objects
       attributes_resolver.select_objects_params(params, factory.object_class).each do |name, value|
+        puts "#{name} - #{value} <br/>"
         set_nested_object(name, value)
       end
     end
@@ -119,7 +123,7 @@ module Traver
     end
     
     def create_nested_object(factory_name, params)
-      object_creator = ObjectCreator.new(factory_name, params, settings, cache)
+      object_creator = ObjectCreator.new(factory_name, params, settings, cache, nesting + 1)
       object_creator.after_create = after_create
       object_creator.create_object
       
