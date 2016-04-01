@@ -6,7 +6,7 @@ class PoroTest < TraverTest
   def setup
     super
     
-    @subject = TraverConstructor.new(PoroSettings.new)
+    @subject = TraverConstructor.new
   end
   
   def teardown
@@ -306,4 +306,23 @@ class PoroTest < TraverTest
     
     assert_equal 2, subject.factories_count
   end
+  
+  # def test_able_to_create_poro_and_ar_objects
+  #   define_model("User", name: :string) do
+  #     attr_accessor :blog
+  #   end
+  #
+  #   define_class("Blog", :title)
+  #
+  #   result = subject.create_graph(user: {
+  #     name: "Walter",
+  #     blog: {
+  #       title: "Hello"
+  #     }
+  #   })
+  #
+  #   assert_equal "Walter", result.user.name
+  #   assert_equal true,     result.user.persisted?
+  #   assert_equal "Hello",  result.blog.title
+  # end
 end

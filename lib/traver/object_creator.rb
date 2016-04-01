@@ -4,30 +4,29 @@ module Traver
   class ObjectCreator
     extend Forwardable
     
-    attr_reader :factory_name, :params, :settings, :cache, :nesting
+    attr_reader :factory_name, :params, :factory_definer, :sequencer, :cache, :nesting
     attr_reader :object
     
     attr_accessor :after_create
     
-    def_delegators :settings, :factory_definer,
-                              :object_persister,
+    def_delegators :settings, :object_persister,
                               :attributes_resolver,
-                              :default_params_creator,
-                              :sequencer
+                              :default_params_creator
     
-    def self.create_object(factory_name, params, settings, cache = {})
-      creator = new(factory_name, params, settings, cache)
+    def self.create_object(factory_name, params, factory_definer, sequencer, cache = {}, nesting = 1)
+      creator = new(factory_name, params, factory_definer, sequencer, cache, nesting)
       creator.create_object
       
       creator.object
     end
     
-    def initialize(factory_name, params, settings, cache = {}, nesting = 1)
-      @factory_name = factory_name
-      @params       = params
-      @settings     = settings
-      @cache        = cache
-      @nesting      = nesting
+    def initialize(factory_name, params, factory_definer, sequencer, cache = {}, nesting = 1)
+      @factory_name    = factory_name
+      @params          = params
+      @factory_definer = factory_definer
+      @sequencer       = sequencer
+      @cache           = cache
+      @nesting         = nesting
     end
     
     def create_object
@@ -123,7 +122,7 @@ module Traver
     end
     
     def create_nested_object(factory_name, params)
-      object_creator = ObjectCreator.new(factory_name, params, settings, cache, nesting + 1)
+      object_creator = ObjectCreator.new(factory_name, params, factory_definer, sequencer, cache, nesting + 1)
       object_creator.after_create = after_create
       object_creator.create_object
       
@@ -185,6 +184,22 @@ module Traver
           create_nested_object(factory_name, params)
         end
       end
+    end
+    
+    # Settings
+    
+    
+    def settings
+      @settings ||=
+        if object_is_active_record?
+          ActiveRecordSettings.new
+        else
+          PoroSettings.new
+        end
+    end
+    
+    def object_is_active_record?
+      factory.object_class < ActiveRecord::Base
     end
     
     

@@ -2,20 +2,19 @@ require "test_helper"
 
 class ListCreatorTest < TraverTest
   attr_reader :subject
-  attr_reader :settings, :object_creator
+  attr_reader :object_creator
   
   def setup
     super
     
     define_class("User", :name)
     
-    @settings = PoroSettings.new
     @object_creator = MiniTest::Mock.new
     
-    @subject = ListCreator.new(2, :user, { name: "Walter" }, settings)
+    @subject = ListCreator.new(2, :user, { name: "Walter" }, FactoryDefiner.new, Sequencer.new)
 
     2.times do
-      object_creator.expect(:create_object, Object, [Symbol, Hash, PoroSettings])
+      object_creator.expect(:create_object, Object, [Symbol, Hash, FactoryDefiner, Sequencer])
     end
   end
   

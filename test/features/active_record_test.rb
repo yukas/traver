@@ -6,7 +6,7 @@ class ActiveRecordTest < TraverTest
   def setup
     super
     
-    @subject = TraverConstructor.new(ActiveRecordSettings.new)
+    @subject = TraverConstructor.new
   end
   
   def teardown
@@ -227,5 +227,20 @@ class ActiveRecordTest < TraverTest
     })
     
     assert_equal graph.car1.id, graph.driver1.car.id
+  end
+  
+  def test_able_to_create_poro_object
+    define_class("Blog", :title, :posts)
+    define_class("Post", :title)
+    
+    result = subject.create_graph(blog: {
+      title: "Hello",
+      posts: [2, title: "Post ${n}"]
+    })
+    
+    assert_equal "Hello", result.blog.title
+    assert_equal 2, result.posts.length
+    assert_equal "Post 1", result.post1.title
+    assert_equal "Post 2", result.post2.title
   end
 end

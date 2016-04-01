@@ -45,15 +45,7 @@ module Traver
     private
     
     def traver_constructor
-      @traver_constructor ||= TraverConstructor.new(settings)
-    end
-    
-    def settings
-      if defined?(Rails)
-        ActiveRecordSettings.new
-      else
-        PoroSettings.new
-      end
+      @traver_constructor ||= TraverConstructor.new
     end
     
     def load_factories

@@ -2,7 +2,7 @@ require "test_helper"
 
 class ObjectCreatorTest < TraverTest
   def subject
-    @subject ||= ObjectCreator.new(:blog, { title: "Hello" }, PoroSettings.new)
+    @subject ||= ObjectCreator.new(:blog, { title: "Hello" }, FactoryDefiner.new, Sequencer.new)
   end
   
   def test_create_object

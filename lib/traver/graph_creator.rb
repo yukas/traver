@@ -1,14 +1,16 @@
 module Traver
   class GraphCreator
-    attr_reader :factory_name, :params, :settings
+    attr_reader :factory_name, :params, :factory_definer, :sequencer
     attr_reader :graph
     
-    def initialize(factory_name, params, settings)
-      @factory_name = factory_name
-      @params = params
-      @settings = settings
+    def initialize(factory_name, params, factory_definer, sequencer)
+      @factory_name    = factory_name
+      @params          = params
+      @factory_definer = factory_definer
+      @sequencer       = sequencer
       
-      @object_creator = ObjectCreator.new(factory_name, params, settings, {})
+      @object_creator = ObjectCreator.new(factory_name, params, factory_definer, sequencer)
+      
       @graph = Graph.new
     end
     
