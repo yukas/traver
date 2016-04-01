@@ -29,6 +29,14 @@ module Traver
     def define_factory(factory_name, *options)
       traver_constructor.define_factory(factory_name, *options)
     end
+
+    alias :factory :define_factory
+    
+    def define_factories(&block)
+      traver_constructor.define_factories(&block)
+    end
+    
+    alias :factories :define_factories
   
     def undefine_all_factories
       traver_constructor.undefine_all_factories

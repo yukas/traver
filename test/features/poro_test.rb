@@ -282,4 +282,28 @@ class PoroTest < TraverTest
     
     assert_equal "Walter White", user.full_name
   end
+  
+  def test_define_factories
+    subject.define_factories do
+      define_factory :user, {
+        name: "Walter"
+      }
+    end
+    
+    assert_equal 1, subject.factories_count
+  end
+  
+  def test_factories
+    subject.factories do
+      factory :user, {
+        name: "Walter"
+      }
+      
+      factory :blog, {
+        title: "Hello"
+      }
+    end
+    
+    assert_equal 2, subject.factories_count
+  end
 end

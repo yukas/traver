@@ -33,14 +33,26 @@ module Traver
       list_creator.list
     end
     
+    def define_factories(&block)
+      instance_exec(&block)
+    end
+    
+    alias :factories :define_factories
+    
     def define_factory(factory_name, *options)
       parent_factory_name, params = parse_factory_options(options)
     
       settings.define_factory(factory_name, parent_factory_name, params)
     end
     
+    alias :factory :define_factory
+    
     def undefine_all_factories
       settings.undefine_all_factories
+    end
+    
+    def factories_count
+      settings.factory_definer.factories_count
     end
     
     private

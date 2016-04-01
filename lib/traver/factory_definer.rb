@@ -8,6 +8,8 @@ module Traver
       factories[factory_name] = Factory.new(factory_name, params, factory_by_name(parent_name))
     end
     
+    alias :factory :define_factory
+    
     def factory_params(factory_name)
       factory_by_name(factory_name).params
     end
