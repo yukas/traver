@@ -42,9 +42,10 @@ module Traver
         merge_factory_params
         merge_default_params
         instantiate_object
-        set_attributes
         set_nested_objects
+        set_attributes
         persist_object
+        set_has_one_objects
         set_nested_collections
         call_after_create_hook
       end
@@ -105,7 +106,6 @@ module Traver
     
     def set_nested_objects
       attributes_resolver.select_objects_params(params, factory.object_class).each do |name, value|
-        puts "#{name} - #{value} <br/>"
         set_nested_object(name, value)
       end
     end
@@ -130,6 +130,14 @@ module Traver
       object_creator.object
     end
     
+    
+    # Has one objects
+    
+    def set_has_one_objects
+      attributes_resolver.select_has_one_objects_params(params, factory.object_class).each do |name, value|
+        set_nested_object(name, value)
+      end
+    end
     
     # Nested Collections
     

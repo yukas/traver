@@ -4,7 +4,15 @@ class PoroTest < TraverTest
   attr_reader :subject
   
   def setup
+    super
+    
     @subject = TraverConstructor.new(PoroSettings.new)
+  end
+  
+  def teardown
+    super
+    
+    subject.undefine_all_factories
   end
   
   def test_create_object

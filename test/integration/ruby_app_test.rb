@@ -9,6 +9,12 @@ class RubyAppTest < TraverTest
     @subject = Traver
   end
   
+  def teardown
+    super
+    
+    subject.undefine_all_factories
+  end
+  
   def test_support_factory_girl_syntax_for_create
     define_class("Blog", :title)
     

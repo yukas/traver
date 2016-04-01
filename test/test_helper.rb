@@ -9,6 +9,15 @@ require "traver"
 class TraverTest < Minitest::Test
   include Traver
   
+  attr_reader :class_definer, :model_definer
+  
+  def setup
+    super
+    
+    @class_definer = ClassDefiner.new
+    @model_definer = ModelDefiner.new
+  end
+  
   def define_class(*args)
     class_definer.define_class(*args)
   end
@@ -22,17 +31,5 @@ class TraverTest < Minitest::Test
     
     class_definer.undefine_all_classes
     model_definer.undefine_all_models
-    
-    Traver.undefine_all_factories
-  end
-  
-  private
-  
-  def class_definer
-    @class_definer ||= ClassDefiner.new
-  end
-  
-  def model_definer
-    @model_definer ||= ModelDefiner.new
   end
 end

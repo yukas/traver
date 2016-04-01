@@ -4,6 +4,8 @@ class SequencerTest < TraverTest
   attr_reader :subject
   
   def setup
+    super
+    
     @subject = Sequencer.new
   end
   

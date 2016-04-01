@@ -1,8 +1,18 @@
 require "test_helper"
 
 class ActiveRecordTest < TraverTest
-  def subject
-    @subject ||= TraverConstructor.new(ActiveRecordSettings.new)
+  attr_reader :subject
+  
+  def setup
+    super
+    
+    @subject = TraverConstructor.new(ActiveRecordSettings.new)
+  end
+  
+  def teardown
+    super
+    
+    subject.undefine_all_factories
   end
   
   def test_create_object
@@ -197,9 +207,25 @@ class ActiveRecordTest < TraverTest
     subject.define_factory :email, {
       address: "walter@white.com"
     }
-
+    
     user = subject.create(:user)
 
     assert_equal user.emails.first.user, user
+  end
+  
+  def test_has_one_association_reuses_parent_object_in_its_belongs_to_association
+    define_model("Car") do
+      has_one :driver
+    end
+    
+    define_model("Driver", car_id: :integer) do
+      belongs_to :car
+    end
+    
+    graph = subject.create_graph(car: {
+      driver: 1
+    })
+    
+    assert_equal graph.car1.id, graph.driver1.car.id
   end
 end
