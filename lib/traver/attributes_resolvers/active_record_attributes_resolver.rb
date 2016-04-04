@@ -1,3 +1,5 @@
+require "traver/attributes_resolver"
+
 module Traver
   class ActiveRecordAttributesResolver < AttributesResolver
     
