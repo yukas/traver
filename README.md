@@ -1,6 +1,20 @@
 # Traver [![Build Status](https://travis-ci.org/yukas/traver.svg?branch=master)](https://travis-ci.org/yukas/traver)
 
-Traver is a test data generation framework.
+The problem with the FactoryGirl is that it is complicated. It helps you define almost anything in terms of how complex your data model is. The thing is though — the more complex your factories the more complex seem to be the design of your system. Nobody wants to work with overcomplicated systems.
+
+We believe that factories should be simple and lightweight just to make it possible to pass validations, everything else should be defined inside the spec itself, so the person who's working with the spec has all the information in place. It is possible with FactoryGirl, but it is too verbose.
+
+FactoryGirl:
+```ruby
+user = FactoryGirl.create(:user)
+blog = FactoryGirl.create(:blog, user: user)
+posts = FactoryGirl.create_list(:post, 2, blog: blog, user: user)
+```
+
+Traver:
+```ruby
+FactoryGirl.create(:user, blog: { posts: 2 })
+```
 
 ## Installation
 
@@ -27,13 +41,15 @@ blog = Traver.create(blog: { title: "Blog" }) #=> #<Blog @title="Blog">
 Define and use factories:
 
 ```ruby
-Traver.define_factory(:user, {
-  full_name: "Walter White"
-})
-
-Traver.define_factory(:post, {
-  title: "Hello"
-})
+Traver.factories do
+  factory :user, {
+    full_name: "Walter White"
+  }
+  
+  factory :post, {
+    title: "Hello"
+  }
+end
 
 Traver.create(:user) #=> #<User @full_name="Walter White">
 Traver.create(:post) #=> #<Post @title="Hello">
@@ -42,13 +58,19 @@ Traver.create(:post) #=> #<Post @title="Hello">
 Define child factories:
 
 ```ruby
-Traver.define_factory(:published_post, :post, {
-  published: true
-})
+Traver.factories do
+  factory :post, {
+    title: "Hello"
+  }
 
-Traver.define_factory(:draft_post, :post, {
-  published: false
-})
+  factory :published_post, :post, {
+    published: true
+  }
+  
+  factory :draft_post, :post, {
+    published: false
+  }
+end
 
 Traver.create(:published_post) #=> #<Post @title="Hello", @published=true>
 Traver.create(:draft_post)     #=> #<Post @title="Hello", @published=false>
@@ -68,7 +90,7 @@ blog.user #=> #<User @name="Mike">
 Create associated objects using factory names:
 
 ```ruby
-Traver.define_factory(:mike, :user, {
+Traver.factory(:mike, :user, {
   name: "Mike"
 })
 
@@ -124,23 +146,37 @@ Graph is a convenient way to reference created objects:
 graph = Traver.create_graph(blog: { posts: [{ tags: 2 }] })
 
 graph.blog  #=> #<Blog>
+
 graph.posts #=> [#<Post>]
+graph.post  #=> #<Post>
 graph.post1 #=> #<Post>
+
 graph.tags  #=> [#<Tag>, #<Tag>]
+graph.tag   #=> #<Tag>
 graph.tag1  #=> #<Tag>
 graph.tag2  #=> #<Tag>
 
-blog, post = Traver.create_graph(blog: { posts: 1 })[:blog, :post]
+# Delegates attributes:
+graph.blog_title  #=> "Hello"
+graph.blog1_title #=> "Hello"
+
+graph.post_tag_title #=> "Tag"
+graph.post1_tag1_title #=> "Tag"
+
+# Delegates methods:
+graph.tags_length #=> 2
 ```
 
-Reference already created objects:
+Use procs for dynamic attribute values:
 
 ```ruby
-blog = Traver.create(blog: {
-  post: { tags: 1 }
-  tags: [-> (graph) { graph.tag1 }]
+blog = Traver.create(event: {
+  start_at:  -> { 1.day.ago },
+  finish_at: -> { start_at + 2.days }
 })
 ```
+
+Procs executed in the context of created object.
 
 ## Rails
 
