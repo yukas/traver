@@ -58,7 +58,11 @@ module Traver
     
     def factories_loader
       if defined?(Rails)
-        FactoriesLoader.new(Rails.root, "spec")
+        if defined?(RSpec)
+          FactoriesLoader.new(Rails.root, "spec")
+        else
+          FactoriesLoader.new(Rails.root, "test")
+        end
       else
         NilFactoriesLoader.new
       end
