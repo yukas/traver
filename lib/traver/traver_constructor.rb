@@ -1,22 +1,22 @@
 module Traver
   class TraverConstructor
-    attr_reader :factory_definer, :sequencer
+    attr_reader :factory_store, :sequencer
     
     def initialize
-      @factory_definer = FactoryDefiner.new
+      @factory_store = FactoryStore.new
       @sequencer       = Sequencer.new
     end
     
     def create(*options)
       factory_name, params = parse_create_options(options)
       
-      ObjectCreator.create_object(factory_name, params, factory_definer, sequencer)
+      ObjectCreator.create_object(factory_name, params, factory_store, sequencer)
     end
     
     def create_graph(*options)
       factory_name, params = parse_create_options(options)
     
-      graph_creator = GraphCreator.new(factory_name, params, factory_definer, sequencer)
+      graph_creator = GraphCreator.new(factory_name, params, factory_store, sequencer)
       graph_creator.create_graph
     
       graph_creator.graph
@@ -25,7 +25,7 @@ module Traver
     def create_list(num, *options)
       factory_name, params = parse_create_options(options)
       
-      list_creator = ListCreator.new(num, factory_name, params, factory_definer, sequencer)
+      list_creator = ListCreator.new(num, factory_name, params, factory_store, sequencer)
       list_creator.create_list
       
       list_creator.list
@@ -40,17 +40,17 @@ module Traver
     def define_factory(factory_name, *options)
       parent_factory_name, params = parse_factory_options(options)
     
-      factory_definer.define_factory(factory_name, parent_factory_name, params)
+      factory_store.define_factory(factory_name, parent_factory_name, params)
     end
     
     alias :factory :define_factory
     
     def undefine_all_factories
-      factory_definer.undefine_all_factories
+      factory_store.undefine_all_factories
     end
     
     def factories_count
-      factory_definer.factories_count
+      factory_store.factories_count
     end
     
     private

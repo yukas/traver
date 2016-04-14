@@ -11,10 +11,10 @@ class ListCreatorTest < TraverTest
     
     @object_creator = MiniTest::Mock.new
     
-    @subject = ListCreator.new(2, :user, { name: "Walter" }, FactoryDefiner.new, Sequencer.new)
+    @subject = ListCreator.new(2, :user, { name: "Walter" }, FactoryStore.new, Sequencer.new)
 
     2.times do
-      object_creator.expect(:create_object, Object, [Symbol, Hash, FactoryDefiner, Sequencer])
+      object_creator.expect(:create_object, Object, [Symbol, Hash, FactoryStore, Sequencer])
     end
   end
   

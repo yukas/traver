@@ -2,7 +2,7 @@ require "test_helper"
 
 class GraphCreatorTest < TraverTest
   def subject
-    @subject ||= GraphCreator.new(:blog,  { title: "Hello" }, FactoryDefiner.new, Sequencer.new)
+    @subject ||= GraphCreator.new(:blog,  { title: "Hello" }, FactoryStore.new, Sequencer.new)
   end
   
   def test_create_graph

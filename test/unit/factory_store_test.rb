@@ -1,12 +1,12 @@
 require "test_helper"
 
-class FactoryDefinerTest < TraverTest
+class FactoryStoreTest < TraverTest
   attr_reader :subject
   
   def setup
     super
     
-    @subject = FactoryDefiner.new
+    @subject = FactoryStore.new
   end
   
   def test_define_factory
