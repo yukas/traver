@@ -9,19 +9,23 @@ module Traver
     end
     
     def root_factory
-      parent_factory ? parent_factory.root_factory : self
+      if parent_factory
+        parent_factory.root_factory
+      else
+        self
+      end
     end
 
+    def root_name
+      root_factory.name
+    end
+    
     def inherited_params
       if parent_factory
         parent_factory.inherited_params.merge(params)
       else
         params
       end
-    end
-    
-    def root_name
-      root_factory.name
     end
     
     def object_class_name
