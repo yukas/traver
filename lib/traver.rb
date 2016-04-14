@@ -6,8 +6,6 @@ module Traver
   class Error < Exception; end
   
   class << self
-    attr_reader :factories_loaded
-    
     def create(*options)
       load_factories
       
@@ -49,23 +47,11 @@ module Traver
     end
     
     def load_factories
-      unless factories_loaded
-        factories_loader.load_factories
-
-        @factories_loaded = true
-      end
+      factories_loader.load_factories
     end
     
     def factories_loader
-      if defined?(Rails)
-        if defined?(RSpec)
-          FactoriesLoader.new(Rails.root, "spec")
-        else
-          FactoriesLoader.new(Rails.root, "test")
-        end
-      else
-        NilFactoriesLoader.new
-      end
+      @factories_loader ||= FactoriesLoader.new(Dir.getwd)
     end
   end
 end

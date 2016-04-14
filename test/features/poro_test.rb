@@ -307,6 +307,32 @@ class PoroTest < TraverTest
     assert_equal 2, subject.factories_count
   end
   
+  def test_support_factory_girl_syntax_for_create
+    define_class("Blog", :title)
+    
+    blog = subject.create(:blog, title: "Hello")
+    
+    assert_equal "Hello", blog.title
+  end
+
+  def test_support_factory_girl_syntax_for_create_graph
+    define_class("Blog", :title)
+    
+    graph = subject.create_graph(:blog, title: "Hello")
+    
+    assert_equal "Hello", graph.blog.title
+  end
+  
+  def test_support_factory_girl_syntax_for_create_list
+    define_class("Blog", :title)
+    
+    blogs = subject.create_list(2, :blog, title: "Hello")
+    
+    assert_equal 2, blogs.length
+    assert_equal "Hello", blogs.first.title
+    assert_equal "Hello", blogs.last.title
+  end
+  
   # def test_able_to_create_poro_and_ar_objects
   #   define_model("User", name: :string) do
   #     attr_accessor :blog
