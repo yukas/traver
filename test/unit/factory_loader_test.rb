@@ -1,12 +1,12 @@
 require "test_helper"
 
-class FactoriesLoaderTest < TraverTest
+class FactoryLoaderTest < TraverTest
   attr_reader :subject
   
   def setup
     super
     
-    @subject = FactoriesLoader.new("/base/dir")
+    @subject = FactoryLoader.new("/base/dir")
   end
   
   def test_load_factories

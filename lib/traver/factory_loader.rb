@@ -1,5 +1,5 @@
 module Traver
-  class FactoriesLoader
+  class FactoryLoader
     attr_reader :base_dir, :folder_name
     attr_reader :factories_loaded
     
