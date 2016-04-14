@@ -12,19 +12,7 @@ class FactoryDefinerTest < TraverTest
   def test_define_factory
     subject.define_factory(:post, nil, title: "Hello")
     
-    assert_equal Hash[{ title: "Hello" }], subject.factory_params(:post)
-    assert_equal nil, subject.parent_factory_name(:post)
-  end
-  
-  def test_define_factory_with_a_parent
-    subject.define_factory(:published_post, :post, published: true)
-    
-    assert_equal Hash[{
-      published: true
-    }], subject.factory_params(:published_post)
-    
-    assert_equal :post,
-      subject.parent_factory_name(:published_post)
+    assert subject.factory_defined?(:post)
   end
   
   def test_factory_by_name

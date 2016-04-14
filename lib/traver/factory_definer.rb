@@ -8,23 +8,14 @@ module Traver
       factories[factory_name] = Factory.new(factory_name, params, factory_by_name(parent_name))
     end
     
-    alias :factory :define_factory
-    
-    def factory_params(factory_name)
-      factory_by_name(factory_name).params
-    end
-    
-    def parent_factory_name(factory_name)
-      factory_by_name(factory_name).parent_factory &&
-        factory_by_name(factory_name).parent_factory.name
-    end
-
-    def parent_factory_params(factory_name)
-      factory_by_name(factory_name).parent_factory.params
+    def factory_defined?(factory_name)
+      factories.has_key?(factory_name)
     end
     
     def factory_by_name(factory_name)
-      factories[factory_name] || default_factory(factory_name) if factory_name
+      if factory_name
+        factories[factory_name] || empty_factory(factory_name)
+      end
     end
     
     def undefine_all_factories
@@ -35,10 +26,12 @@ module Traver
       factories.keys.length
     end
     
+    alias :factory :define_factory
+    
     private
     attr_reader :factories
     
-    def default_factory(factory_name)
+    def empty_factory(factory_name)
       Factory.new(factory_name, {}, nil)
     end
   end
