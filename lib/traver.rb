@@ -46,11 +46,11 @@ module Traver
     end
     
     def load_factories
-      factory_loader.load_factories
+      factories_loader.load_factories
     end
     
-    def factory_loader
-      @factory_loader ||= FactoryLoader.new(Dir.getwd)
+    def factories_loader
+      @factories_loader ||= FactoriesLoader.new(Dir.getwd)
     end
   end
 end
