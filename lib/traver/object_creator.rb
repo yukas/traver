@@ -197,7 +197,7 @@ module Traver
     end
     
     def object_is_active_record?
-      Object.const_defined?("ActiveRecord::Base") && factory.object_class < ActiveRecord::Base
+      Object.const_defined?("ActiveRecord") && factory.object_class < ActiveRecord::Base
     end
     
     
