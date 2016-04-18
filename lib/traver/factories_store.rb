@@ -1,5 +1,5 @@
 module Traver
-  class FactoryStore
+  class FactoriesStore
     def initialize
       undefine_all_factories
     end
