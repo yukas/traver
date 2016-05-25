@@ -115,7 +115,7 @@ class ActiveRecordTest < TraverTest
       posts: 2
     })
   
-    assert_equal 2, blog.posts.count
+    assert_equal 2, blog.posts.length
   end
   
   def test_any_level_of_nesting
