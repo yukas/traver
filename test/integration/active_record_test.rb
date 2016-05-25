@@ -29,7 +29,7 @@ class ActiveRecordTest < TraverTest
     blog = subject.create(blog: { title: "Hello" })
 
     assert_equal "Hello", blog.title
-    assert_equal true, blog.persisted?
+    assert_equal true,    blog.persisted?
   end
 
   def test_create_object_using_factory
@@ -39,7 +39,7 @@ class ActiveRecordTest < TraverTest
     post = subject.create(:post)
 
     assert_equal "Hello", post.title
-    assert_equal true, post.persisted?
+    assert_equal true,    post.persisted?
   end
 
   def test_create_object_using_child_factory
@@ -51,8 +51,9 @@ class ActiveRecordTest < TraverTest
     post = subject.create(:published_post)
 
     assert_equal "Hello", post.title
-    assert_equal true, post.published
-    assert_equal true, post.persisted?
+    assert_equal true,    post.published
+    
+    assert_equal true,    post.persisted?
   end
 
   def test_create_associated_object
@@ -68,9 +69,10 @@ class ActiveRecordTest < TraverTest
     })
 
     assert_equal "Hello", blog.title
+    assert_equal true,    blog.persisted?
+    
     assert_equal "Mike",  blog.user.name
-    assert_equal true, blog.persisted?
-    assert_equal true, blog.user.persisted?
+    assert_equal true,    blog.user.persisted?
   end
 
   def test_create_associated_collection
@@ -91,16 +93,16 @@ class ActiveRecordTest < TraverTest
     })
 
     assert_equal "Hello", blog.title
-    assert_equal true, blog.persisted?
+    assert_equal true,    blog.persisted?
 
     assert_equal "Post #1", blog.posts.first.title
-    assert_equal true, blog.posts.first.persisted?
+    assert_equal true,      blog.posts.first.persisted?
 
     assert_equal "Post #2", blog.posts.last.title
-    assert_equal true, blog.posts.last.persisted?
+    assert_equal true,      blog.posts.last.persisted?
   end
 
-  def test_create_collection_using_number
+  def test_create_collection_using_digit
     define_model("Blog") do
       has_many :posts
     end
@@ -113,7 +115,7 @@ class ActiveRecordTest < TraverTest
       posts: 2
     })
   
-    assert_equal 2, blog.posts.length
+    assert_equal 2, blog.posts.count
   end
   
   def test_any_level_of_nesting
@@ -139,13 +141,13 @@ class ActiveRecordTest < TraverTest
     })
      
     assert_equal "Blog", blog.title
-    assert_equal true, blog.persisted?
+    assert_equal true,   blog.persisted?
      
     assert_equal "Hello", blog.posts.first.title
-    assert_equal true, blog.posts.first.persisted?
+    assert_equal true,    blog.posts.first.persisted?
      
     assert_equal "Tag",   blog.posts.first.tags.first.name
-    assert_equal true, blog.posts.first.tags.first.persisted?
+    assert_equal true,    blog.posts.first.tags.first.persisted?
   end
 
   def test_assign_hash_if_no_association_exists
@@ -191,7 +193,7 @@ class ActiveRecordTest < TraverTest
     assert_equal true, post.blog.persisted?
   end
 
-  def test_reuse_parent_object_for_child_belongs_to_associations
+  def test_reuse_objects_for_belongs_to_associations
     define_model("User", name: :string) do
       has_many :emails
     end
@@ -222,11 +224,11 @@ class ActiveRecordTest < TraverTest
       belongs_to :car
     end
     
-    graph = subject.create_graph(car: {
+    car = subject.create(car: {
       driver: 1
     })
     
-    assert_equal graph.car1.id, graph.driver1.car.id
+    assert_equal car.id, car.driver.car.id
   end
   
   def test_able_to_create_poro_object
@@ -238,9 +240,46 @@ class ActiveRecordTest < TraverTest
       posts: [2, title: "Post ${n}"]
     })
     
-    assert_equal "Hello", result.blog.title
-    assert_equal 2, result.posts.length
+    assert_equal "Hello",  result.blog.title
+    assert_equal 2,        result.posts.length
     assert_equal "Post 1", result.post1.title
     assert_equal "Post 2", result.post2.title
+  end
+  
+  def test_collection_association_can_take_array_of_objects
+    define_model("Blog", title: :string) do
+      has_many :posts
+    end
+    
+    define_model("Post", blog_id: :integer, title: :string) do
+      belongs_to :blog
+    end
+    
+    blog = subject.create(:blog, posts: [
+      subject.create(:post, title: "Post #1"), subject.create(:post, title: "Post #2")
+    ])
+    
+    assert_equal "Post #1", blog.posts.first.title
+    assert_equal "Post #2", blog.posts.last.title
+  end
+  
+  def test_balongs_to_association_can_take_objects
+    define_model("Car", color: :string) do
+      has_one :driver
+    end
+    
+    define_model("Driver", car_id: :integer) do
+      belongs_to :car
+    end
+    
+    driver = subject.create(driver: {
+      car: subject.create(car: {
+        color: "Red"
+      })
+    })
+    
+    assert_equal "Red", driver.car.color
+    assert_equal true,  driver.persisted?
+    assert_equal true,  driver.car.persisted?
   end
 end

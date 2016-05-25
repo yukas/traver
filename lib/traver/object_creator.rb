@@ -4,7 +4,7 @@ module Traver
   class ObjectCreator
     extend Forwardable
     
-    attr_reader :factory_name, :params, :factories_store, :sequencer, :cache, :nesting
+    attr_reader :factory_name, :params, :factory_definer, :sequencer, :cache, :nesting
     attr_reader :object
     
     attr_accessor :after_create
@@ -13,17 +13,17 @@ module Traver
                               :attributes_resolver,
                               :default_params_creator
     
-    def self.create_object(factory_name, params, factories_store, sequencer, cache = {}, nesting = 1)
-      creator = new(factory_name, params, factories_store, sequencer, cache, nesting)
+    def self.create_object(factory_name, params, factory_definer, sequencer, cache = {}, nesting = 1)
+      creator = new(factory_name, params, factory_definer, sequencer, cache, nesting)
       creator.create_object
       
       creator.object
     end
     
-    def initialize(factory_name, params, factories_store, sequencer, cache = {}, nesting = 1)
+    def initialize(factory_name, params, factory_definer, sequencer, cache = {}, nesting = 1)
       @factory_name    = factory_name
       @params          = params
-      @factories_store = factories_store
+      @factory_definer = factory_definer
       @sequencer       = sequencer
       @cache           = cache
       @nesting         = nesting
@@ -35,6 +35,8 @@ module Traver
       if obtain_object_from_cache?
         obtain_object_from_cache
       else
+        # puts "#{'-' * nesting} #{factory_name}<br/>"
+        
         change_ref_to_be_empty_hash
         merge_factory_params
         merge_default_params
@@ -42,6 +44,7 @@ module Traver
         set_nested_objects
         set_attributes
         persist_object
+        cache_object
         set_has_one_objects
         set_nested_collections
         call_after_create_hook
@@ -52,7 +55,7 @@ module Traver
     attr_reader :factory
     
     def obtain_factory
-      @factory = factories_store.factory_by_name(factory_name)
+      @factory = factory_definer.factory_by_name(factory_name)
     end
     
     def obtain_object_from_cache?
@@ -116,11 +119,12 @@ module Traver
         set_attribute(name, create_nested_object(value, {}))
       else
         set_attribute(name, value)
+        cache[name] = value
       end
     end
     
     def create_nested_object(factory_name, params)
-      object_creator = ObjectCreator.new(factory_name, params, factories_store, sequencer, cache, nesting + 1)
+      object_creator = ObjectCreator.new(factory_name, params, factory_definer, sequencer, cache, nesting + 1)
       object_creator.after_create = after_create
       object_creator.create_object
       
@@ -176,10 +180,16 @@ module Traver
           else
             raise "Wrong collection params #{params_array}"
           end
-        end
-      
-        params_array.map do |params|
-          create_nested_object(factory_name, params)
+          
+          params_array.map do |params|
+            create_nested_object(factory_name, params)
+          end
+        elsif params_array.first.is_a?(Hash)
+          params_array.map do |params|
+            create_nested_object(factory_name, params)
+          end
+        else
+          params_array
         end
       end
     end
@@ -197,7 +207,7 @@ module Traver
     end
     
     def object_is_active_record?
-      Object.const_defined?("ActiveRecord") && factory.object_class < ActiveRecord::Base
+      factory.object_class < ActiveRecord::Base
     end
     
     
@@ -205,6 +215,9 @@ module Traver
     
     def persist_object
       object_persister.persist_object(object)
+    end
+    
+    def cache_object
       cache[factory.root_name] = object
     end
     
