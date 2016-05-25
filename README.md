@@ -1,17 +1,7 @@
 # Traver [![Build Status](https://travis-ci.org/yukas/traver.svg?branch=master)](https://travis-ci.org/yukas/traver)
 
-## Fixtures
-There are number of problems with fixtures:
-
-1. Magic values — you don't see there attribute values comes from
-2. You don't know how the record is setup, because it is not happening in context of the test
-3. Test data is centarized - if you need to change something, good chance you'll brake a lot of tests
-4. Hard to maintain — you need to manually change every fixture if your model changes
-
-## FactoryGirl
-The problem with the FactoryGirl is that it is complicated. It helps you define almost anything in terms of how complex your data model is. The thing is though — the more complex your factories the more complex seem to be the design of your system. Nobody wants to work with overcomplicated systems.
-
-We believe that factories should be simple and lightweight just to make it possible to pass validations, everything else should be defined inside the spec itself, so the person who's working with the spec has all the information in place. It is possible with FactoryGirl, but it is too verbose.
+## Advantages
+#### Concise syntax
 
 FactoryGirl:
 ```ruby
@@ -24,6 +14,14 @@ Traver:
 ```ruby
 FactoryGirl.create(:user, blog: { posts: 2 })
 ```
+
+#### Ability to setup data inside specs
+
+Thanks to concise syntax, you're able to setup data inside the spec itself, opposite to factory file. So you see all setup at a glance.
+
+#### No centralized setup
+
+As soon as all setup happening in the spec itself, no more braking specs when you change one factory.
 
 ## Installation
 
