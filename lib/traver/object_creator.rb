@@ -161,6 +161,10 @@ module Traver
         params_array.map do |params|
           create_nested_object(factory_name, params)
         end
+      elsif params_array.first == :__ref__
+        params_array.map do |_|
+          create_nested_object(factory_name, :__ref__)
+        end
       elsif params_array.first.is_a?(Symbol)
         params_array.map do |factory_name|
           create_nested_object(factory_name, {})

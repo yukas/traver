@@ -118,6 +118,43 @@ class ActiveRecordTest < TraverTest
     assert_equal 2, blog.posts.length
   end
   
+  def test_create_collection_using_array_of_objects
+    define_model("Blog", title: :string) do
+      has_many :posts
+    end
+    
+    define_model("Post", blog_id: :integer, title: :string) do
+      belongs_to :blog
+    end
+    
+    blog = subject.create(:blog, posts: [
+      subject.create(:post, title: "Post #1"), subject.create(:post, title: "Post #2")
+    ])
+    
+    assert_equal "Post #1", blog.posts.first.title
+    assert_equal "Post #2", blog.posts.last.title
+  end
+  
+  def test_create_collection_using_reference
+    define_model("Event", layout_id: :integer) do
+      has_one  :layout
+      has_many :ticket_types
+    end
+    
+    define_model("TicketType", event_id: :integer) do
+      belongs_to :event
+    end
+    
+    define_model("Layout", event_id: :integer, ticket_type_id: :integer) do
+      belongs_to :event
+      belongs_to :ticket_type
+    end
+    
+    blog = subject.create(:event, ticket_types: [ :__ref__ ], layout: 1)
+    
+    assert_equal 1, TicketType.count
+  end
+  
   def test_any_level_of_nesting
     define_model("Blog", title: :string) do
       has_many :posts
@@ -244,23 +281,6 @@ class ActiveRecordTest < TraverTest
     assert_equal 2,        result.posts.length
     assert_equal "Post 1", result.post1.title
     assert_equal "Post 2", result.post2.title
-  end
-  
-  def test_collection_association_can_take_array_of_objects
-    define_model("Blog", title: :string) do
-      has_many :posts
-    end
-    
-    define_model("Post", blog_id: :integer, title: :string) do
-      belongs_to :blog
-    end
-    
-    blog = subject.create(:blog, posts: [
-      subject.create(:post, title: "Post #1"), subject.create(:post, title: "Post #2")
-    ])
-    
-    assert_equal "Post #1", blog.posts.first.title
-    assert_equal "Post #2", blog.posts.last.title
   end
   
   def test_balongs_to_association_can_take_objects
