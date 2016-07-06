@@ -271,13 +271,27 @@ class PoroTest < TraverTest
     end
   end
   
-  def test_evaluate_proc_in_context_of_created_object
+  def test_evaluate_proc_with_one_argument_which_is_created_object
     define_class("User", :first_name, :last_name, :full_name)
     
     user = subject.create(user: {
       first_name: "Walter",
       last_name: "White",
-      full_name: -> { "#{first_name} #{last_name}" }
+      full_name: -> (o) { "#{o.first_name} #{o.last_name}" }
+    })
+    
+    assert_equal "Walter White", user.full_name
+  end
+  
+  def test_evaluate_proc_with_zero_arguments
+    define_class("User", :first_name, :last_name, :full_name)
+    
+    full_name = "Walter White"
+    
+    user = subject.create(user: {
+      first_name: "Walter",
+      last_name: "White",
+      full_name: -> (o) { full_name }
     })
     
     assert_equal "Walter White", user.full_name

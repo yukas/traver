@@ -92,7 +92,14 @@ module Traver
     
     def set_attribute(attribute, value)
       if value.is_a?(Proc)
-        value = object.instance_exec(&value)
+        value = 
+          if value.arity == 0
+            value.call
+          elsif value.arity == 1
+            value.call(object)
+          else
+            raise "Parameter block can have either 0 or 1 argument"
+          end
       elsif value.is_a?(String)
         if sequencer.value_has_sequence?(value)
           value = sequencer.interpolate_sequence(attribute, value)
