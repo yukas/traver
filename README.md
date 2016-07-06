@@ -143,6 +143,29 @@ Create associated with already existing objects:
 Traver.create(blog: { title: "Hello", posts: [post1, post2] })
 ```
 
+### Reusing associations
+
+Traver reuses already created objects for similar associations:
+
+```ruby
+class Blog
+  belongs_to :user
+  has_many   :posts
+end
+  
+class Post
+  belongs_to :user
+end
+```
+```ruby
+blog = Traver.create(blog, posts: 1) # => blog.user == blog.posts.first.user
+```
+
+We can explicitly specify to create separate users for blog and a post:
+
+```ruby
+blog = Traver.create(blog, posts: [ { user: 1 } ]) # => blog.user != blog.posts.first.user
+```
 
 Create lists with sequences:
 
