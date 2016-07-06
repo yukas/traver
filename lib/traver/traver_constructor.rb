@@ -7,6 +7,12 @@ module Traver
       @sequencer       = Sequencer.new
     end
     
+    def include(*modules)
+      modules.each do |mod|
+        self.class.include(mod)
+      end
+    end
+    
     def create(*options)
       factory_name, params = parse_create_options(options)
       
