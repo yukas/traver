@@ -9,7 +9,7 @@ module Traver
     
     def include(*modules)
       modules.each do |mod|
-        self.class.include(mod)
+        self.class.send(:include, mod)
       end
     end
     
