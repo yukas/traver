@@ -277,7 +277,7 @@ class PoroTest < TraverTest
     user = subject.create(user: {
       first_name: "Walter",
       last_name: "White",
-      full_name: -> (o) { "#{o.first_name} #{o.last_name}" }
+      full_name: -> o { "#{o.first_name} #{o.last_name}" }
     })
     
     assert_equal "Walter White", user.full_name
@@ -291,7 +291,7 @@ class PoroTest < TraverTest
     user = subject.create(user: {
       first_name: "Walter",
       last_name: "White",
-      full_name: -> (o) { full_name }
+      full_name: -> { full_name }
     })
     
     assert_equal "Walter White", user.full_name

@@ -209,7 +209,7 @@ Use procs for dynamic attribute values:
 ```ruby
 blog = Traver.create(event: {
   start_at:  -> { 1.day.ago },
-  finish_at: -> (object) { object.start_at + 2.days }
+  finish_at: -> object { object.start_at + 2.days }
 })
 ```
 
