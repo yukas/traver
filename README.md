@@ -12,7 +12,7 @@ posts = FactoryGirl.create_list(:post, 2, blog: blog, user: user)
 
 Traver:
 ```ruby
-FactoryGirl.create(:user, blog: { posts: 2 })
+Traver.create(:user, blog: { posts: 2 })
 ```
 
 #### Ability to setup data inside specs
