@@ -17,7 +17,7 @@ FactoryGirl.create(:user, blog: { posts: 2 })
 
 #### Ability to setup data inside specs
 
-Thanks to concise syntax, you're able to setup data inside the spec itself, opposite to factory file. So you see all setup at a glance.
+Thanks to concise syntax, you're able to setup data inside the spec itself, opposite to factory file, so you'll see all setup at a glance.
 
 #### No centralized setup
 
